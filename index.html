@@ -3,128 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Tlač Kalkulačka - Pro3D.sk</title>
+    <title>Pro3D.sk | Profesionálna Kalkulačka</title>
     <style>
-        /* Definícia farieb pre svetlý a tmavý režim */
         :root { --bg: #f4f4f9; --card: white; --text: #333; --border: #ddd; --res-bg: #e7f3ff; --res-text: #007bff; }
         [data-theme="dark"] { --bg: #121212; --card: #1e1e1e; --text: #e0e0e0; --border: #333; --res-bg: #1a2635; --res-text: #4da3ff; }
-
-        body { font-family: sans-serif; background: var(--bg); color: var(--text); padding: 20px; display: flex; justify-content: center; transition: 0.3s; }
-        .card { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 400px; width: 100%; position: relative; }
-        
+        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); padding: 15px; display: flex; justify-content: center; transition: 0.3s; margin: 0; }
+        .card { background: var(--card); padding: 20px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 440px; width: 100%; position: relative; }
         .logo-container { text-align: center; margin-bottom: 15px; }
         .logo-container img { max-width: 140px; }
-
-        h2 { text-align: center; margin-top: 0; }
-        label { display: block; margin-top: 10px; font-size: 0.9em; opacity: 0.8; }
-        input, select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid var(--border); border-radius: 6px; box-sizing: border-box; font-size: 1em; background: var(--card); color: var(--text); }
-
-        .result { margin-top: 20px; padding: 15px; background: var(--res-bg); border-radius: 8px; text-align: center; }
-        .total { font-size: 1.5em; font-weight: bold; color: var(--res-text); }
-        .breakdown { font-size: 0.85em; margin-top: 10px; line-height: 1.6; }
-        
-        .controls { display: flex; gap: 10px; margin-top: 15px; }
-        button { flex: 1; padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        label { display: block; margin-top: 10px; font-size: 0.75em; font-weight: bold; opacity: 0.6; text-transform: uppercase; }
+        input, select { width: 100%; padding: 10px; margin-top: 4px; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; font-size: 1em; background: var(--card); color: var(--text); }
+        .row { display: flex; gap: 10px; }
+        .row > div { flex: 1; }
+        .result { margin-top: 20px; padding: 15px; background: var(--res-bg); border-radius: 12px; text-align: center; border: 1px solid var(--res-text); }
+        .total { font-size: 2.2em; font-weight: 800; color: var(--res-text); }
+        .breakdown { font-size: 0.8em; margin-top: 10px; line-height: 1.5; border-top: 1px solid rgba(0,0,0,0.08); padding-top: 8px; text-align: left; }
+        .controls { display: flex; gap: 8px; margin-top: 15px; }
+        button { flex: 1; padding: 10px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.9em; }
         .btn-reset { background: #ff4d4d; color: white; }
         .btn-theme { background: #555; color: white; }
+        .elec-tag { display: inline-block; font-size: 0.7em; padding: 2px 6px; border-radius: 4px; margin-top: 4px; }
+        .high-temp { background: #fff3cd; color: #856404; }
     </style>
 </head>
-<body>
+<body data-theme="light">
 
 <div class="card">
     <div class="logo-container">
         <img src="https://pro3d.sk/wp-content/uploads/2023/10/logo_pro3d_horizontal.png" alt="Pro3D Logo">
     </div>
-    <h2>Cena 3D Tlače</h2>
     
-    <label>Typ materiálu</label>
-    <select id="matType" onchange="updatePrice()">
-        <option value="22">PLA (22€/kg)</option>
-        <option value="25">PETG (25€/kg)</option>
-        <option value="35">ASA (35€/kg)</option>
-        <option value="45">TPU (45€/kg)</option>
+    <label>Materiál a kvalita</label>
+    <select id="matType" onchange="calculate()">
+        <optgroup label="Standard">
+            <option value="15" data-temp="low">PLA Standard (15€/kg)</option>
+            <option value="15" data-temp="low">PETG Standard (15€/kg)</option>
+            <option value="20" data-temp="high">ASA Standard (20€/kg)</option>
+            <option value="30" data-temp="high">PC Standard (30€/kg)</option>
+            <option value="25" data-temp="low">TPU Standard (25€/kg)</option>
+        </optgroup>
+        <optgroup label="Profi / Brand">
+            <option value="20" data-temp="low">PLA Profi (20€/kg)</option>
+            <option value="20" data-temp="low">PETG Profi (20€/kg)</option>
+            <option value="25" data-temp="high">ASA Profi (25€/kg)</option>
+            <option value="40" data-temp="high">PC Profi (40€/kg)</option>
+            <option value="40" data-temp="low">TPU Profi (40€/kg)</option>
+        </optgroup>
     </select>
 
-    <label>Cena materiálu (€ za 1kg)</label>
-    <input type="number" id="matPrice" value="22" oninput="calculate()">
+    <div class="row">
+        <div>
+            <label>Čas tlače (hod)</label>
+            <input type="number" id="printTime" value="0" step="0.1" oninput="calculate()">
+        </div>
+        <div>
+            <label>Váha v g (zo slicera)</label>
+            <input type="number" id="weight" value="0" oninput="calculate()">
+        </div>
+    </div>
 
-    <label>Čas tlače (hodiny)</label>
-    <input type="number" id="printTime" value="0" step="0.1" oninput="calculate()">
+    <div class="row">
+        <div>
+            <label>Tvoja práca (min)</label>
+            <input type="number" id="workTime" value="10" oninput="calculate()">
+        </div>
+        <div>
+            <label>Marža / Zisk (%)</label>
+            <input type="number" id="margin" value="20" oninput="calculate()">
+        </div>
+    </div>
 
-    <label>Váha modelu + odpad (gramy)</label>
-    <input type="number" id="weight" value="0" oninput="calculate()">
-
-    <label>Tvoja príprava (minúty)</label>
-    <input type="number" id="workTime" value="10" oninput="calculate()">
-
-    <label>Marža / Zisk (%)</label>
-    <input type="number" id="margin" value="30" oninput="calculate()">
+    <div class="row">
+        <div>
+            <label>Fixný poplatok (€)</label>
+            <input type="number" id="adminFee" value="1.50" step="0.1" oninput="calculate()">
+        </div>
+    </div>
 
     <div class="result">
-        <div>Odporúčaná cena:</div>
+        <div id="tempBadge" class="elec-tag"></div>
+        <div style="font-weight: bold; opacity: 0.7; font-size: 0.9em;">Celková cena:</div>
         <div class="total" id="totalPrice">0.00 €</div>
-        <div class="breakdown" id="breakdown">Zadajte údaje...</div>
+        <div id="breakdown" class="breakdown">Zadajte údaje...</div>
     </div>
 
     <div class="controls">
-        <button type="button" class="btn-reset" onclick="reset()">Vynulovať</button>
-        <button type="button" class="btn-theme" onclick="toggleTheme()">Režim 🌓</button>
+        <button class="btn-reset" onclick="reset()">Vynulovať</button>
+        <button class="btn-theme" onclick="toggleTheme()">Režim 🌓</button>
     </div>
 </div>
 
 <script>
-// Apply saved theme (or system preference) as early as possible
-(function() {
-    const saved = localStorage.getItem('theme'); // 'dark' / 'light' or null
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    if (saved === 'dark' || (!saved && prefersDark)) {
-        document.body.setAttribute('data-theme', 'dark');
-    } else {
-        document.body.setAttribute('data-theme', 'light');
-    }
-})();
-
-function updatePrice() {
-    document.getElementById('matPrice').value = document.getElementById('matType').value;
-    calculate();
-}
-
 function toggleTheme() {
     const body = document.body;
-    const newTheme = body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-    body.setAttribute('data-theme', newTheme);
-    localStorage.setItem('theme', newTheme); // uloženie voľby
+    body.setAttribute('data-theme', body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
 }
 
 function reset() {
     document.getElementById('printTime').value = 0;
     document.getElementById('weight').value = 0;
     document.getElementById('workTime').value = 10;
+    document.getElementById('adminFee').value = 1.50;
     calculate();
 }
 
 function calculate() {
-    const machineRate = 0.65; // Amortizácia + elektrina X1C
-    const laborRate = 15.00; // €/hod za tvoj čas
+    const matSelect = document.getElementById('matType');
+    const tempType = matSelect.options[matSelect.selectedIndex].getAttribute('data-temp');
+    
+    // Konštanty (Sadzby)
+    const machineBase = 0.60; // Základ (Stroj + Bežná elek)
+    const highTempExtra = 0.15; // Príplatok za 100°C podložku
+    const laborRate = 10.00; // Tvoja hodinovka
 
     const printTime = parseFloat(document.getElementById('printTime').value) || 0;
     const weight = parseFloat(document.getElementById('weight').value) || 0;
-    const matPrice = parseFloat(document.getElementById('matPrice').value) || 0;
-    const workTime = parseFloat(document.getElementById('workTime').value) || 0;
+    const matPrice = parseFloat(matSelect.value) || 0;
+    const workTimeMin = parseFloat(document.getElementById('workTime').value) || 0;
     const marginPercent = parseFloat(document.getElementById('margin').value) || 0;
+    const adminFee = parseFloat(document.getElementById('adminFee').value) || 0;
 
-    const costMachine = printTime * machineRate;
-    const costMaterial = (weight / 1000) * matPrice * 1.1; // +10% odpad
-    const costLabor = (workTime / 60) * laborRate;
+    // Logika stroja
+    const currentMachineRate = (tempType === 'high') ? (machineBase + highTempExtra) : machineBase;
     
-    const baseCost = costMachine + costMaterial + costLabor;
-    const finalPrice = baseCost * (1 + (marginPercent / 100));
+    // Výpočet nákladov
+    const costMachine = printTime * currentMachineRate;
+    const costMat = (weight / 1000) * matPrice * 1.1; // 10% odpad
+    const costLabor = (workTimeMin / 60) * laborRate;
+    
+    const totalCosts = costMachine + costMat + costLabor + adminFee;
+    const finalPrice = totalCosts * (1 + (marginPercent / 100));
 
-    document.getElementById('totalPrice').innerText = finalPrice.toFixed(2) + " €";
-    document.getElementById('breakdown').innerHTML = `
-        Materiál: ${costMaterial.toFixed(2)} € | Stroj: ${costMachine.toFixed(2)} €<br>
-        Práca: ${costLabor.toFixed(2)} €
-    `;
+    // UI Úpravy
+    const badge = document.getElementById('tempBadge');
+    if(tempType === 'high') {
+        badge.innerText = "⚡ VYSOKÁ TEPLOTA (0.75€/h)";
+        badge.className = "elec-tag high-temp";
+        badge.style.display = "inline-block";
+    } else {
+        badge.innerText = "❄️ BEŽNÁ TEPLOTA (0.60€/h)";
+        badge.className = "elec-tag";
+        badge.style.display = "inline-block";
+    }
+
+    if (finalPrice > 0) {
+        document.getElementById('totalPrice').innerText = finalPrice.toFixed(2) + " €";
+        document.getElementById('breakdown').innerHTML = `
+            • Materiál (+10% rezerva): ${costMat.toFixed(2)} €<br>
+            • Prevádzka stroja: ${costMachine.toFixed(2)} €<br>
+            • Práca a príprava: ${costLabor.toFixed(2)} €<br>
+            • Fixný poplatok: ${adminFee.toFixed(2)} €<br>
+            <strong>• Náklady spolu: ${totalCosts.toFixed(2)} €</strong>
+        `;
+    } else {
+        document.getElementById('totalPrice').innerText = "0.00 €";
+        document.getElementById('breakdown').innerText = "Zadajte údaje zo Slicera...";
+    }
 }
 calculate();
 </script>
