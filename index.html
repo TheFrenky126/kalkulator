@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Kalkulačka - Materiály</title>
+    <style>
+        body { font-family: -apple-system, system-ui, sans-serif; background: #f0f2f5; padding: 15px; display: flex; justify-content: center; }
+        .card { background: white; padding: 25px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); max-width: 450px; width: 100%; }
+        h2 { color: #1a1a1b; text-align: center; margin-bottom: 20px; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9em; color: #444; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #ced4da; border-radius: 8px; box-sizing: border-box; font-size: 1em; background-color: #f8f9fa; }
+        input:focus, select:focus { outline: none; border-color: #007bff; background-color: #fff; }
+        .result { margin-top: 25px; padding: 20px; background: #007bff; color: white; border-radius: 12px; text-align: center; }
+        .total { font-size: 2em; font-weight: 800; display: block; margin: 5px 0; }
+        .breakdown { font-size: 0.85em; opacity: 0.9; line-height: 1.5; border-top: 1px solid rgba(255,255,255,0.2); margin-top: 10px; padding-top: 10px; text-align: left; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>3D Tlač Kalkulačka</h2>
+    
+    <div class="input-group">
+        <label>Typ materiálu</label>
+        <select id="matType" onchange="updateMaterialPrice()">
+            <option value="22">PLA (bežný - 22€/kg)</option>
+            <option value="25">PETG (odolný - 25€/kg)</option>
+            <option value="35">ASA (UV odolný - 35€/kg)</option>
+            <option value="45">TPU (flexibilný - 45€/kg)</option>
+            <option value="custom">Iný (zadať vlastnú cenu)</option>
+        </select>
+    </div>
+
+    <div class="input-group">
+        <label>Cena materiálu (€ za 1kg)</label>
+        <input type="number" id="matPrice" value="22" step="0.5" oninput="calculate()">
+    </div>
+
+    <div class="input-group" style="display: flex; gap: 10px;">
+        <div style="flex: 1;">
+            <label>Čas (hodiny)</label>
+            <input type="number" id="printTime" value="2" step="0.1" oninput="calculate()">
+        </div>
+        <div style="flex: 1;">
+            <label>Váha (gramy)</label>
+            <input type="number" id="weight" value="50" oninput="calculate()">
+        </div>
+    </div>
+
+    <div class="input-group">
+        <label>Tvoja práca (minúty prípravy)</label>
+        <input type="number" id="workTime" value="10" oninput="calculate()">
+    </div>
+
+    <div class="input-group">
+        <label>Marža / Zisk (%)</label>
+        <input type="number" id="margin" value="25" oninput="calculate()">
+    </div>
+
+    <div class="result">
+        <span>Konečná cena pre zákazníka:</span>
+        <span class="total" id="totalPrice">0.00 €</span>
+        
+        <div class="breakdown" id="breakdown"></div>
+    </div>
+</div>
+
+<script>
+// Ceny elektriny a stroja pre Bambu Lab X1C
+const machineRate = 0.65; // Odpisy + servisná rezerva
+const electricityBase = 0.05; // PLA/PETG (nižšia teplota podložky)
+const electricityHigh = 0.09; // ASA (vysoká teplota podložky + vyhrievanie komory)
+
+function updateMaterialPrice() {
+    const selection = document.getElementById('matType').value;
+    if (selection !== "custom") {
+        document.getElementById('matPrice').value = selection;
+    }
+    calculate();
+}
+
+function calculate() {
+    const printTime = parseFloat(document.getElementById('printTime').value) || 0;
+    const weight = parseFloat(document.getElementById('weight').value) || 0;
+    const matPrice = parseFloat(document.getElementById('matPrice').value) || 0;
+    const workTime = parseFloat(document.getElementById('workTime').value) || 0;
+    const marginPercent = parseFloat(document.getElementById('margin').value) || 0;
+    const matTypeLabel = document.getElementById('matType').options[document.getElementById('matType').selectedIndex].text;
+
+    // Dynamická cena elektriny podľa materiálu (ASA žerie viac)
+    const currentElec = matTypeLabel.includes("ASA") ? electricityHigh : electricityBase;
+
+    // Výpočty
+    const costMachine = printTime * (machineRate + currentElec);
+    const costMaterial = (weight / 1000) * matPrice * 1.05; // +5% rezerva na odpad
+    const costLabor = (workTime / 60) * 15.00; // 15€/h za tvoj čas
+    
+    const baseCost = costMachine + costMaterial + costLabor;
+    const finalPrice = baseCost * (1 + (marginPercent / 100));
+
+    document.getElementById('totalPrice').innerText = finalPrice.toFixed(2) + " €";
+    
+    document.getElementById('breakdown').innerHTML = `
+        Materiál (${weight}g): ${costMaterial.toFixed(2)} €<br>
+        Opotrebenie stroja (${printTime}h): ${costMachine.toFixed(2)} €<br>
+        Tvoja práca: ${costLabor.toFixed(2)} €<br>
+        <strong>Náklady celkom: ${baseCost.toFixed(2)} €</strong>
+    `;
+}
+
+// Inicializácia
+calculate();
+</script>
+
+</body>
+</html>
