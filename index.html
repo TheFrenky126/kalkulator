@@ -18,7 +18,7 @@
         h2 { text-align: center; margin-top: 0; }
         label { display: block; margin-top: 10px; font-size: 0.9em; opacity: 0.8; }
         input, select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid var(--border); border-radius: 6px; box-sizing: border-box; font-size: 1em; background: var(--card); color: var(--text); }
-        
+
         .result { margin-top: 20px; padding: 15px; background: var(--res-bg); border-radius: 8px; text-align: center; }
         .total { font-size: 1.5em; font-weight: bold; color: var(--res-text); }
         .breakdown { font-size: 0.85em; margin-top: 10px; line-height: 1.6; }
@@ -67,12 +67,23 @@
     </div>
 
     <div class="controls">
-        <button class="btn-reset" onclick="reset()">Vynulovať</button>
-        <button class="btn-theme" onclick="toggleTheme()">Režim 🌓</button>
+        <button type="button" class="btn-reset" onclick="reset()">Vynulovať</button>
+        <button type="button" class="btn-theme" onclick="toggleTheme()">Režim 🌓</button>
     </div>
 </div>
 
 <script>
+// Apply saved theme (or system preference) as early as possible
+(function() {
+    const saved = localStorage.getItem('theme'); // 'dark' / 'light' or null
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (saved === 'dark' || (!saved && prefersDark)) {
+        document.body.setAttribute('data-theme', 'dark');
+    } else {
+        document.body.setAttribute('data-theme', 'light');
+    }
+})();
+
 function updatePrice() {
     document.getElementById('matPrice').value = document.getElementById('matType').value;
     calculate();
@@ -80,7 +91,9 @@ function updatePrice() {
 
 function toggleTheme() {
     const body = document.body;
-    body.setAttribute('data-theme', body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    const newTheme = body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    body.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme); // uloženie voľby
 }
 
 function reset() {
