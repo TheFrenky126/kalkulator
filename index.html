@@ -1,217 +1,612 @@
 <!DOCTYPE html>
 <html lang="sk">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Pro3D.sk | Výpočet ceny tlače</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulačka nákladov 3D tlače | Pro3D.sk</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --bg:#f4f4f9; --card:white; --text:#333; --border:#ddd; --res-bg:#e7f3ff; --res-text:#007bff; --muted:rgba(0,0,0,0.55); }
-        [data-theme="dark"]{ --bg:#121212; --card:#1e1e1e; --text:#e0e0e0; --border:#333; --res-bg:#1a2635; --res-text:#4da3ff; --muted:rgba(255,255,255,0.6); }
-        html,body{height:100%;margin:0;}
-        body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; background:var(--bg); color:var(--text); display:flex; align-items:flex-start; justify-content:center; padding:20px; transition:0.2s;}
-        .card{width:100%;max-width:640px;background:var(--card);border-radius:14px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,0.06);box-sizing:border-box;}
-        .logo-container{text-align:center;margin-bottom:12px;}
-        .logo-container img{max-width:140px}
-        label{display:block;font-size:0.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-top:8px}
-        input,select{width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:1rem;box-sizing:border-box;background:var(--card);color:var(--text);outline:none}
-        .row{display:flex;gap:10px;margin-top:8px}
-        .row>div{flex:1}
-        .result{margin-top:18px;padding:14px;background:var(--res-bg);border-radius:10px;border:1px solid var(--res-text);text-align:center}
-        .total{font-size:2.2rem;font-weight:800;color:var(--res-text);margin-top:6px}
-        .breakdown{font-size:0.9rem;margin-top:10px;text-align:left;line-height:1.45;border-top:1px solid rgba(0,0,0,0.06);padding-top:8px}
-        .controls{display:flex;gap:8px;margin-top:14px}
-        button{flex:1;padding:10px;border-radius:8px;border:none;cursor:pointer;font-weight:700}
-        .btn-reset{background:#ff4d4d;color:white}
-        .btn-theme{background:#555;color:white}
-        .elec-tag{display:inline-block;font-size:0.8rem;padding:3px 8px;border-radius:6px;margin-top:4px}
-        .high-temp{background:#fff3cd;color:#856404}
-        .small-note{font-size:0.85rem;color:var(--muted);margin-top:8px}
-        .checkbox-row{display:flex;align-items:center;gap:8px;margin-top:10px}
-        .checkbox-row input[type="checkbox"]{width:18px;height:18px}
-        @media (max-width:480px){ .row{flex-direction:column} .controls{flex-direction:column} }
+        /* --- 1. CSS VARIABLES & RESET --- */
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --accent: #10b981;
+            --accent-hover: #059669;
+            --danger: #ef4444;
+            --bg: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --input-bg: #f9fafb;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            --radius: 16px;
+            --transition: all 0.3s ease;
+        }
+
+        [data-theme="dark"] {
+            --bg: #111827;
+            --card-bg: #1f2937;
+            --text-main: #f9fafb;
+            --text-muted: #9ca3af;
+            --border: #374151;
+            --input-bg: #374151;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        * { box-sizing: border-box; outline: none; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            transition: var(--transition);
+        }
+
+        /* --- 2. LAYOUT & COMPONENTS --- */
+        .container {
+            width: 100%;
+            max-width: 900px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .container { grid-template-columns: 1fr 1fr; }
+            .full-width { grid-column: span 2; }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            width: 100%;
+        }
+        .header img { max-height: 60px; margin-bottom: 10px; }
+        .header h1 { font-size: 1.5rem; margin: 0; font-weight: 700; }
+
+        .card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+        }
+
+        h2 {
+            font-size: 1.1rem;
+            margin: 0 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+            color: var(--primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* --- 3. FORMS & INPUTS --- */
+        .form-group { margin-bottom: 15px; }
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        input[type="number"], select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--input-bg);
+            color: var(--text-main);
+            font-size: 1rem;
+            font-family: inherit;
+            transition: var(--transition);
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+        }
+
+        .row { display: flex; gap: 15px; }
+        .row > div { flex: 1; }
+        
+        /* Legend styles */
+        .legend {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        .legend summary { cursor: pointer; font-weight: 600; }
+        .legend[open] summary { margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        .legend ul { margin: 0; padding-left: 20px; line-height: 1.6; }
+
+        /* Custom Checkbox */
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            background: var(--input-bg);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+        }
+        .checkbox-wrapper input { margin-right: 10px; width: 18px; height: 18px; cursor: pointer; }
+        .checkbox-wrapper label { margin: 0; cursor: pointer; text-transform: none; color: var(--text-main); }
+
+        /* --- 4. RESULTS & TAGS --- */
+        .tag {
+            font-size: 0.7rem;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .tag.low { background: #d4edda; color: #155724; }
+        .tag.high { background: #f8d7da; color: #721c24; }
+
+        .result-box {
+            margin-top: auto;
+            padding: 20px;
+            background: var(--bg);
+            border-radius: var(--radius);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .result-box::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 5px;
+            background: var(--text-muted);
+        }
+        .result-box.profit { background: #e8f5e9; }
+        .result-box.profit::before { background: var(--accent); }
+        [data-theme="dark"] .result-box.profit { background: #1b2e1e; }
+
+        .result-label { font-size: 0.85rem; font-weight: 600; opacity: 0.8; margin-bottom: 5px; }
+        .result-value { font-size: 2rem; font-weight: 800; color: var(--text-main); }
+        .result-breakdown {
+            margin-top: 15px;
+            font-size: 0.85rem;
+            text-align: left;
+            border-top: 1px solid rgba(0,0,0,0.1);
+            padding-top: 10px;
+        }
+        .breakdown-item { display: flex; justify-content: space-between; margin-bottom: 4px; }
+        .breakdown-item.total { font-weight: 700; margin-top: 8px; font-size: 1rem; color: var(--accent); }
+
+        /* --- 5. BUTTONS --- */
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); }
+        
+        .btn-secondary { background: var(--text-muted); color: white; }
+        .btn-secondary:hover { background: #5a6268; }
+
+        .btn-print { background: var(--accent); color: white; width: 100%; justify-content: center; margin-top: 10px; }
+        .btn-print:hover { background: var(--accent-hover); }
+
+        /* --- 6. PRINT STYLES --- */
+        @media print {
+            body { background: white; color: black; padding: 0; }
+            .actions, .theme-toggle { display: none !important; }
+            .container { display: block; }
+            .card { box-shadow: none; border: 1px solid #ccc; margin-bottom: 20px; break-inside: avoid; }
+            input, select { border: none; background: transparent; padding: 0; font-weight: bold; -webkit-appearance: none; }
+            label { opacity: 0.7; }
+            .result-box { background: #f9f9f9 !important; border: 1px solid #eee; }
+            h2 { color: black; border-bottom-color: black; }
+        }
     </style>
 </head>
 <body data-theme="light">
-<div class="card" role="application" aria-labelledby="title">
-    <div class="logo-container">
-        <img src="https://pro3d.sk/wp-content/uploads/2023/10/logo_pro3d_horizontal.png" alt="Pro3D Logo">
-    </div>
 
-    <h2 id="title" style="margin:0 0 8px 0;font-size:1.1rem">Výpočet ceny 3D tlače</h2>
-
-    <label for="matType">Materiál a kvalita</label>
-    <select id="matType" onchange="updateMaterialPrice()" aria-label="Materiál">
-        <optgroup label="Standard">
-            <option value="15" data-temp="low">PLA Standard</option>
-            <option value="15" data-temp="low">PETG Standard</option>
-            <option value="20" data-temp="high">ASA Standard</option>
-            <option value="30" data-temp="high">PC Standard</option>
-            <option value="25" data-temp="low">TPU Standard</option>
-        </optgroup>
-        <optgroup label="Profi / Brand">
-            <option value="20" data-temp="low">PLA Profi</option>
-            <option value="20" data-temp="low">PETG Profi</option>
-            <option value="25" data-temp="high">ASA Profi</option>
-            <option value="40" data-temp="high">PC Profi</option>
-            <option value="40" data-temp="low">TPU Profi</option>
-        </optgroup>
-    </select>
-
-    <div class="row" style="margin-top:6px">
-        <div>
-            <label for="matPriceInput">Cena materiálu (€/kg)</label>
-            <input type="number" id="matPriceInput" value="15" step="0.5" min="0" oninput="calculatePrint()" aria-label="Cena materiálu">
+    <header class="header">
+        <div class="logo-container">
+            <!-- Placeholder pre logo, ak sa nenačíta -->
+            <img src="https://pro3d.sk/wp-content/uploads/2023/10/logo_pro3d_horizontal.png" alt="Pro3D Logo" onerror="this.style.display='none'">
+            <h1>Interná kalkulačka</h1>
         </div>
-        <div>
-            <label for="weight">Váha v g (zo slicera)</label>
-            <input type="number" id="weight" value="50" min="0" oninput="calculatePrint()" aria-label="Váha v gramoch">
-        </div>
-    </div>
+    </header>
 
-    <div class="row">
-        <div>
-            <label for="printTime">Čas tlače (hod)</label>
-            <input type="number" id="printTime" value="2.5" step="0.1" min="0" oninput="calculatePrint()" aria-label="Čas tlače v hodinách">
-        </div>
-        <div>
-            <label for="workTime">Tvoja práca (min)</label>
-            <input type="number" id="workTime" value="30" min="0" oninput="calculatePrint()" aria-label="Práca v minútach">
-        </div>
-    </div>
+    <main class="container">
+        
+        <!-- SEKICIA 1: VÝROBA -->
+        <section class="card">
+            <h2>
+                1. Výroba (1 ks)
+                <span id="machineRateTag" class="tag low">PLA/PETG</span>
+            </h2>
 
-    <div class="row">
-        <div>
-            <label for="margin">Marža / Zisk (%)</label>
-            <input type="number" id="margin" value="0" step="0.1" min="0" oninput="calculatePrint()" aria-label="Marža v percentách">
-        </div>
-        <div>
-            <label for="adminFee">Fixný poplatok (€)</label>
-            <input type="number" id="adminFee" value="0" step="0.1" min="0" oninput="calculatePrint()" aria-label="Fixný poplatok">
-        </div>
-    </div>
+            <div class="form-group">
+                <label for="jobName">Názov zákazky</label>
+                <input type="text" id="jobName" placeholder="Napr. Držiak na mobil">
+            </div>
 
-    <!-- AMS checkbox (default checked) -->
-    <div class="checkbox-row">
-        <input type="checkbox" id="amsCheckbox" checked onchange="calculatePrint()" aria-checked="true" />
-        <label for="amsCheckbox" style="margin:0;font-size:0.95rem;font-weight:600;color:var(--text);text-transform:none">
-            Použiť AMS (amortizácia) — pripočíta +0,10 €/h k prevádzke stroja
-        </label>
-    </div>
-    <div class="small-note">
-        AMS: amortizácia a údržba automatického systému (AM S). Prednastavené zapnuté kvôli amortizácii zariadenia.
-    </div>
+            <div class="form-group">
+                <label for="materialSelect">Materiál</label>
+                <select id="materialSelect">
+                    <optgroup label="Standard">
+                        <option value="15" data-temp="low">PLA Standard (15€)</option>
+                        <option value="15" data-temp="low">PETG Standard (15€)</option>
+                        <option value="20" data-temp="high">ASA Standard (20€)</option>
+                        <option value="30" data-temp="high">PC Standard (30€)</option>
+                        <option value="25" data-temp="low">TPU Standard (25€)</option>
+                    </optgroup>
+                    <optgroup label="Profi">
+                        <option value="20" data-temp="low">PLA Profi (20€)</option>
+                        <option value="20" data-temp="low">PETG Profi (20€)</option>
+                        <option value="25" data-temp="high">ASA Profi (25€)</option>
+                        <option value="40" data-temp="high">PC Profi (40€)</option>
+                        <option value="40" data-temp="low">TPU Profi (40€)</option>
+                    </optgroup>
+                </select>
+            </div>
 
-    <div class="result" aria-live="polite">
-        <div id="tempBadge" class="elec-tag" aria-hidden="true"></div>
-        <div style="font-weight:700;opacity:0.75;margin-top:6px">Celková cena:</div>
-        <div class="total" id="totalPrice">0.00 €</div>
-        <div id="breakdown" class="breakdown">Zadajte údaje...</div>
-        <div class="small-note">
-            Výpočty: Materiál = (váha v g / 1000) × cena/kg × 1.1 (rezerva 10 %). Prevádzka stroja = čas tlače × hodinová sadzba (+ AMS ak zapnuté). Práca = minúty práce / 60 × hodinová sadzba.
+            <div class="row">
+                <div class="form-group">
+                    <label for="materialPrice">Cena (€/kg)</label>
+                    <input type="number" id="materialPrice" value="15" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label for="weight">Váha (g)</label>
+                    <input type="number" id="weight" value="50" placeholder="0">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group">
+                    <label for="printTime">Čas tlače (h)</label>
+                    <input type="number" id="printTime" value="2.5" step="0.1" placeholder="0.0">
+                </div>
+                <div class="form-group">
+                    <label for="adminFee">Fix. poplatok (€)</label>
+                    <input type="number" id="adminFee" value="0" step="0.1">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="useAMS" checked>
+                    <label for="useAMS">Zapojiť AMS (+0.10€/h)</label>
+                </div>
+            </div>
+
+            <div class="result-box">
+                <div class="result-label">NÁKLAD NA 1 KUS</div>
+                <div class="result-value" id="unitCostDisplay">0.00 €</div>
+            </div>
+        </section>
+
+        <!-- SEKCIA 2: OBCHOD -->
+        <section class="card">
+            <h2>2. Obchod a Zisk</h2>
+
+            <div class="row">
+                <div class="form-group">
+                    <label for="multiplier">Počet kusov</label>
+                    <input type="number" id="multiplier" value="1" min="1">
+                </div>
+                <div class="form-group">
+                    <label for="workTime">Tvoja práca (min)</label>
+                    <input type="number" id="workTime" value="0">
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="form-group">
+                    <label for="margin">Marža (%)</label>
+                    <input type="number" id="margin" value="20">
+                </div>
+                <div class="form-group">
+                    <label for="tax">Daň / DPH (%)</label>
+                    <input type="number" id="tax" value="0">
+                </div>
+            </div>
+
+            <div class="result-box profit">
+                <div class="result-label" style="color: var(--accent);">CENA PRE ZÁKAZNÍKA</div>
+                <div class="result-value" id="finalPriceDisplay" style="color: var(--accent);">0.00 €</div>
+                
+                <div class="result-breakdown" id="breakdownDisplay">
+                    <!-- JS will populate this -->
+                </div>
+            </div>
+        </section>
+
+        <!-- LEGENDA -->
+        <details class="card legend full-width">
+            <summary>ℹ️ Ako sa počíta cena?</summary>
+            <ul>
+                <li><strong>Materiál:</strong> Počíta sa z váhy modelu a ceny filamentu. Automaticky sa pripočítava <strong>15% rezerva</strong> na odpad (kalibrácia, purge, nepodarky).</li>
+                <li><strong>Stroj:</strong> Náklady na elektrinu a amortizáciu. Sadzba je 0.60€/h (PLA/PETG) alebo 0.75€/h (ASA/PC). Pri použití AMS sa pripočítava 0.10€/h.</li>
+                <li><strong>Práca:</strong> Tvoj čas strávený prípravou (slicing), obsluhou tlačiarne alebo post-processingom. Počíta sa sadzbou 10.00€/hod.</li>
+                <li><strong>Marža:</strong> Percentuálny zisk, ktorý sa pripočíta k celkovým nákladom (výroba + práca). Slúži na rozvoj podnikania a čistý zisk.</li>
+                <li><strong>Daň:</strong> Suma, ktorú odvádzaš štátu (napr. DPH 20%). Pripočítava sa k cene s maržou.</li>
+            </ul>
+        </details>
+
+        <!-- OVLÁDANIE -->
+        <div class="actions full-width">
+            <button class="btn-secondary" id="btnTheme">🌓 Režim</button>
+            <button class="btn-secondary" id="btnReset" style="background: var(--danger);">Vynulovať</button>
+            <button class="btn-print" onclick="window.print()">🖨️ Stiahnuť cenovú ponuku (PDF)</button>
         </div>
-    </div>
 
-    <div class="controls" role="group" aria-label="Ovládacie tlačidlá">
-        <button class="btn-reset" onclick="resetPrintCalc()" title="Nastaví predvolené hodnoty">Vynulovať</button>
-        <button class="btn-theme" onclick="toggleTheme()" title="Prepne svetlý/temný režim">Režim 🌓</button>
-    </div>
-</div>
+    </main>
 
 <script>
-/* PRINT CALC ONLY (with AMS option) */
+/**
+ * LOGIKA KALKULAČKY
+ * Oddelená od UI pre lepšiu čitateľnosť a údržbu.
+ */
+const Calculator = {
+    CONSTANTS: {
+        LABOR_RATE_PER_HOUR: 10.00,
+        WASTE_MULTIPLIER: 1.15, // 15% odpad
+        RATE_LOW_TEMP: 0.60,
+        RATE_HIGH_TEMP: 0.75,
+        AMS_SURCHARGE: 0.10
+    },
 
-// Update material price when selecting a material preset
-function updateMaterialPrice() {
-    const matSelect = document.getElementById('matType');
-    const selectedPrice = matSelect.value;
-    document.getElementById('matPriceInput').value = selectedPrice;
-    calculatePrint();
-}
+    // Získa hodinovú sadzbu stroja na základe typu materiálu a AMS
+    getMachineRate(tempType, useAMS) {
+        let baseRate = tempType === 'high' 
+            ? this.CONSTANTS.RATE_HIGH_TEMP 
+            : this.CONSTANTS.RATE_LOW_TEMP;
+        
+        if (useAMS) {
+            baseRate += this.CONSTANTS.AMS_SURCHARGE;
+        }
+        return baseRate;
+    },
 
-// Theme toggle
-function toggleTheme() {
-    const body = document.body;
-    body.setAttribute('data-theme', body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-}
+    // Výpočet nákladov na výrobu 1 kusu
+    calculateProductionCost(inputs) {
+        const { weightG, materialPricePerKg, printTimeH, adminFee, machineRate } = inputs;
 
-// Reset: restore the requested defaults and keep AMS checked
-function resetPrintCalc() {
-    document.getElementById('matType').selectedIndex = 0;
-    // mirror selected option into price input
-    document.getElementById('matPriceInput').value = document.getElementById('matType').value;
-    document.getElementById('printTime').value = 2.5;
-    document.getElementById('weight').value = 50;
-    document.getElementById('workTime').value = 30;
-    document.getElementById('adminFee').value = 0;
-    document.getElementById('margin').value = 0;
-    // AMS default should be checked
-    document.getElementById('amsCheckbox').checked = true;
-    calculatePrint();
-}
+        const materialCost = (weightG / 1000) * materialPricePerKg * this.CONSTANTS.WASTE_MULTIPLIER;
+        const machineCost = printTimeH * machineRate;
+        
+        return materialCost + machineCost + adminFee;
+    },
 
-// Main calculation
-function calculatePrint() {
-    const matSelect = document.getElementById('matType');
-    const tempType = matSelect.options[matSelect.selectedIndex].getAttribute('data-temp');
+    // Výpočet finálnej ceny a zisku
+    calculateFinalPrice(unitCost, inputs) {
+        const { multiplier, workTimeMin, marginPercent, taxPercent } = inputs;
 
-    // Rates (can be adjusted)
-    const machineBase = 0.60; // €/h for normal
-    const highTempExtra = 0.15; // extra €/h for high-temp materials
-    const laborRate = 10.00; // €/h labor
-    const amsHourly = 0.10; // AMS amortization per hour (added when checkbox checked)
+        const totalProductionCost = unitCost * multiplier;
+        const laborCost = (workTimeMin / 60) * this.CONSTANTS.LABOR_RATE_PER_HOUR;
+        
+        const subTotal = totalProductionCost + laborCost;
+        const priceNoTax = subTotal * (1 + (marginPercent / 100));
+        const profitFromMargin = priceNoTax - subTotal;
+        
+        const taxAmount = priceNoTax * (taxPercent / 100);
+        const priceWithTax = priceNoTax + taxAmount;
+        
+        // Zaokrúhľovanie na 0.50 € nahor
+        const roundedPrice = Math.ceil(priceWithTax * 2) / 2;
+        const roundingDiff = roundedPrice - priceWithTax;
+        
+        const totalProfit = laborCost + profitFromMargin + roundingDiff;
 
-    const printTime = parseFloat(document.getElementById('printTime').value) || 0;
-    const weight = parseFloat(document.getElementById('weight').value) || 0;
-    const matPrice = parseFloat(document.getElementById('matPriceInput').value) || 0;
-    const workTimeMin = parseFloat(document.getElementById('workTime').value) || 0;
-    const marginPercent = parseFloat(document.getElementById('margin').value) || 0;
-    const adminFee = parseFloat(document.getElementById('adminFee').value) || 0;
-    const amsEnabled = !!document.getElementById('amsCheckbox').checked;
-
-    // compute machine hourly rate including high-temp extra and AMS (if enabled)
-    let currentMachineRate = machineBase;
-    if (tempType === 'high') currentMachineRate += highTempExtra;
-    if (amsEnabled) currentMachineRate += amsHourly;
-
-    const costMachine = printTime * currentMachineRate;
-    const costMat = (weight / 1000) * matPrice * 1.1; // 10% extra material margin
-    const costLabor = (workTimeMin / 60) * laborRate;
-
-    const totalCosts = costMachine + costMat + costLabor + adminFee;
-    const finalPrice = totalCosts * (1 + (marginPercent / 100));
-
-    const badge = document.getElementById('tempBadge');
-    if (tempType === 'high') {
-        badge.innerText = "⚡ VYSOKÁ TEPLOTA";
-        badge.className = "elec-tag high-temp";
-    } else {
-        badge.innerText = "❄️ BEŽNÁ TEPLOTA";
-        badge.className = "elec-tag";
+        return {
+            totalProductionCost,
+            laborCost,
+            profitFromMargin,
+            totalProfit,
+            priceNoTax,
+            taxAmount,
+            priceWithTax,
+            roundedPrice
+        };
     }
+};
 
-    if (totalCosts > 0 || adminFee > 0) {
-        document.getElementById('totalPrice').innerText = finalPrice.toFixed(2) + " €";
-        document.getElementById('breakdown').innerHTML = `
-            • Materiál (${matPrice.toFixed(2)} €/kg + 10%): ${costMat.toFixed(2)} €<br>
-            • Prevádzka stroja (${currentMachineRate.toFixed(2)} €/h): ${costMachine.toFixed(2)} €${amsEnabled ? ' <span style="color:#555;font-size:0.85em"> (vrátane AMS +' + amsHourly.toFixed(2) + '€/h)</span>' : '' }<br>
-            • Práca a príprava: ${costLabor.toFixed(2)} €<br>
-            • Fixný poplatok: ${adminFee.toFixed(2)} €<br>
-            <strong>• Náklady spolu: ${totalCosts.toFixed(2)} €</strong>
+/**
+ * UI MANAŽMENT
+ * Stará sa o DOM elementy a eventy.
+ */
+const App = {
+    elements: {},
+
+    init() {
+        this.cacheElements();
+        this.bindEvents();
+        this.loadTheme();
+        this.update(); // Prvý výpočet
+    },
+
+    cacheElements() {
+        // Inputs
+        this.elements.jobName = document.getElementById('jobName');
+        this.elements.materialSelect = document.getElementById('materialSelect');
+        this.elements.materialPrice = document.getElementById('materialPrice');
+        this.elements.weight = document.getElementById('weight');
+        this.elements.printTime = document.getElementById('printTime');
+        this.elements.adminFee = document.getElementById('adminFee');
+        this.elements.useAMS = document.getElementById('useAMS');
+        this.elements.multiplier = document.getElementById('multiplier');
+        this.elements.workTime = document.getElementById('workTime');
+        this.elements.margin = document.getElementById('margin');
+        this.elements.tax = document.getElementById('tax');
+
+        // Outputs
+        this.elements.machineRateTag = document.getElementById('machineRateTag');
+        this.elements.unitCostDisplay = document.getElementById('unitCostDisplay');
+        this.elements.finalPriceDisplay = document.getElementById('finalPriceDisplay');
+        this.elements.breakdownDisplay = document.getElementById('breakdownDisplay');
+
+        // Buttons
+        this.elements.btnTheme = document.getElementById('btnTheme');
+        this.elements.btnReset = document.getElementById('btnReset');
+    },
+
+    bindEvents() {
+        // Input listeners pre prepočet
+        const inputs = [
+            'materialPrice', 'weight', 'printTime', 'adminFee', 
+            'useAMS', 'multiplier', 'workTime', 'margin', 'tax'
+        ];
+        inputs.forEach(id => {
+            document.getElementById(id).addEventListener('input', () => this.update());
+        });
+
+        // Špeciálny listener pre select (zmena ceny a typu)
+        this.elements.materialSelect.addEventListener('change', () => {
+            this.elements.materialPrice.value = this.elements.materialSelect.value;
+            this.update();
+        });
+
+        // Buttons
+        this.elements.btnTheme.addEventListener('click', () => this.toggleTheme());
+        this.elements.btnReset.addEventListener('click', () => this.reset());
+    },
+
+    getInputs() {
+        const matOption = this.elements.materialSelect.options[this.elements.materialSelect.selectedIndex];
+        
+        return {
+            tempType: matOption.getAttribute('data-temp'),
+            materialPricePerKg: parseFloat(this.elements.materialPrice.value) || 0,
+            weightG: parseFloat(this.elements.weight.value) || 0,
+            printTimeH: parseFloat(this.elements.printTime.value) || 0,
+            adminFee: parseFloat(this.elements.adminFee.value) || 0,
+            useAMS: this.elements.useAMS.checked,
+            multiplier: parseFloat(this.elements.multiplier.value) || 1,
+            workTimeMin: parseFloat(this.elements.workTime.value) || 0,
+            marginPercent: parseFloat(this.elements.margin.value) || 0,
+            taxPercent: parseFloat(this.elements.tax.value) || 0
+        };
+    },
+
+    update() {
+        const inputs = this.getInputs();
+
+        // 1. Zisti sadzbu stroja
+        const machineRate = Calculator.getMachineRate(inputs.tempType, inputs.useAMS);
+        this.updateMachineTag(inputs.tempType, machineRate);
+
+        // 2. Vypočítaj náklad na 1 kus
+        const unitCost = Calculator.calculateProductionCost({ ...inputs, machineRate });
+        
+        // 3. Vypočítaj finálne čísla
+        const results = Calculator.calculateFinalPrice(unitCost, inputs);
+
+        // 4. Vykresli
+        this.render(unitCost, results, inputs.multiplier);
+    },
+
+    updateMachineTag(tempType, rate) {
+        const tag = this.elements.machineRateTag;
+        const isHigh = tempType === 'high';
+        tag.textContent = isHigh ? `ASA/PC (${rate.toFixed(2)}€/h)` : `PLA/PETG (${rate.toFixed(2)}€/h)`;
+        tag.className = `tag ${isHigh ? 'high' : 'low'}`;
+    },
+
+    render(unitCost, results, count) {
+        // Animácia čísel by sa dala pridať tu, ale pre jednoduchosť meníme text
+        this.elements.unitCostDisplay.textContent = unitCost.toFixed(2) + " €";
+        this.elements.finalPriceDisplay.innerHTML = `
+            <div style="font-size: 0.4em; opacity: 0.6; margin-bottom: 5px; font-weight: 600;">Presne: ${results.priceWithTax.toFixed(2)} €</div>
+            ${results.roundedPrice.toFixed(2)} €
         `;
-    } else {
-        document.getElementById('totalPrice').innerText = "0.00 €";
-        document.getElementById('breakdown').innerText = "Zadajte údaje zo Slicera...";
-    }
-}
 
-// Initialize defaults on load
-document.addEventListener('DOMContentLoaded', function () {
-    // ensure price input matches selected material on first load
-    document.getElementById('matPriceInput').value = document.getElementById('matType').value;
-    // ensure AMS checkbox default is checked
-    document.getElementById('amsCheckbox').checked = true;
-    calculatePrint();
-});
+        this.elements.breakdownDisplay.innerHTML = `
+            <div class="breakdown-item">
+                <span>Výrobné náklady (${count} ks)</span>
+                <span>${results.totalProductionCost.toFixed(2)} €</span>
+            </div>
+            <div class="breakdown-item">
+                <span>Tvoja práca</span>
+                <span>${results.laborCost.toFixed(2)} €</span>
+            </div>
+            <div class="breakdown-item">
+                <span>Marža</span>
+                <span>${results.profitFromMargin.toFixed(2)} €</span>
+            </div>
+            <div class="breakdown-item" style="opacity: 0.7;">
+                <span>Cena bez DPH</span>
+                <span>${results.priceNoTax.toFixed(2)} €</span>
+            </div>
+            <div class="breakdown-item" style="color: var(--danger);">
+                <span>Daň (štátu)</span>
+                <span>${results.taxAmount.toFixed(2)} €</span>
+            </div>
+            <div class="breakdown-item total">
+                <span>Tvoj čistý zisk</span>
+                <span>${results.totalProfit.toFixed(2)} €</span>
+            </div>
+        `;
+    },
+
+    toggleTheme() {
+        const body = document.body;
+        const current = body.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        body.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next); // Uloženie do pamäte
+    },
+
+    loadTheme() {
+        const saved = localStorage.getItem('theme') || 'light';
+        document.body.setAttribute('data-theme', saved);
+    },
+
+    reset() {
+        this.elements.jobName.value = '';
+        this.elements.materialSelect.selectedIndex = 0; // PLA Standard (prvá možnosť)
+        this.elements.materialPrice.value = 15;
+        this.elements.weight.value = 50;
+        this.elements.printTime.value = 2.5;
+        this.elements.adminFee.value = 0;
+        this.elements.useAMS.checked = true;
+        this.elements.multiplier.value = 1;
+        this.elements.workTime.value = 0;
+        this.elements.margin.value = 20;
+        this.elements.tax.value = 0;
+        this.update();
+    }
+};
+
+// Spustenie aplikácie
+document.addEventListener('DOMContentLoaded', () => App.init());
+
 </script>
+
 </body>
 </html>
