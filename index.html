@@ -5,25 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pro3D.sk | Profesionálna Kalkulačka</title>
     <style>
-        :root { --bg: #f4f4f9; --card: white; --text: #333; --border: #ddd; --res-bg: #e7f3ff; --res-text: #007bff; }
-        [data-theme="dark"] { --bg: #121212; --card: #1e1e1e; --text: #e0e0e0; --border: #333; --res-bg: #1a2635; --res-text: #4da3ff; }
+        :root { --bg: #f4f4f9; --card: white; --text: #333; --border: #ddd; --res-bg: #e7f3ff; --res-text: #007bff; --muted: rgba(0,0,0,0.55); }
+        [data-theme="dark"] { --bg: #121212; --card: #1e1e1e; --text: #e0e0e0; --border: #333; --res-bg: #1a2635; --res-text: #4da3ff; --muted: rgba(255,255,255,0.6); }
         body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); padding: 15px; display: flex; justify-content: center; transition: 0.3s; margin: 0; }
-        .card { background: var(--card); padding: 20px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 440px; width: 100%; position: relative; }
+        .card { background: var(--card); padding: 20px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 640px; width: 100%; position: relative; }
         .logo-container { text-align: center; margin-bottom: 15px; }
         .logo-container img { max-width: 140px; }
         label { display: block; margin-top: 10px; font-size: 0.75em; font-weight: bold; opacity: 0.6; text-transform: uppercase; }
-        input, select { width: 100%; padding: 10px; margin-top: 4px; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; font-size: 1em; background: var(--card); color: var(--text); }
+        input, select { width: 100%; padding: 10px; margin-top: 4px; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; font-size: 1em; background: var(--card); color: var(--text); outline: none; }
+        input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { opacity: 0.5; }
         .row { display: flex; gap: 10px; }
         .row > div { flex: 1; }
         .result { margin-top: 20px; padding: 15px; background: var(--res-bg); border-radius: 12px; text-align: center; border: 1px solid var(--res-text); }
         .total { font-size: 2.2em; font-weight: 800; color: var(--res-text); }
-        .breakdown { font-size: 0.8em; margin-top: 10px; line-height: 1.5; border-top: 1px solid rgba(0,0,0,0.08); padding-top: 8px; text-align: left; }
+        .breakdown { font-size: 0.9em; margin-top: 10px; line-height: 1.5; border-top: 1px solid rgba(0,0,0,0.08); padding-top: 8px; text-align: left; }
         .controls { display: flex; gap: 8px; margin-top: 15px; }
         button { flex: 1; padding: 10px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.9em; }
         .btn-reset { background: #ff4d4d; color: white; }
         .btn-theme { background: #555; color: white; }
+        .btn-mini { background: #2b8a3e; color: white; }
         .elec-tag { display: inline-block; font-size: 0.7em; padding: 2px 6px; border-radius: 4px; margin-top: 4px; }
         .high-temp { background: #fff3cd; color: #856404; }
+        .small-note { font-size: 0.82em; color: var(--muted); margin-top: 8px; font-style: italic; text-align: left; }
+        /* Mini kalkulačka */
+        .mini-calc { margin-top: 12px; padding: 12px; border-radius: 10px; background: rgba(0,0,0,0.03); display: none; }
+        .mini-calc .calc-top { display:flex; gap:8px; align-items:center; }
+        .mini-calc input { font-size: 1.1em; padding: 8px; margin-bottom: 8px; flex:1; border-radius: 8px; border: 1px solid var(--border); background: white; }
+        .mini-calc .calc-controls { display:flex; gap:8px; margin-top:6px; }
+        .mini-calc button { padding: 8px; border-radius: 8px; font-weight: 700; min-width: 44px; }
+        .calc-result { margin-top: 8px; font-weight: 700; color: var(--res-text); }
+        .keypad { margin-top:8px; display:grid; grid-template-columns: repeat(4, 1fr); gap:8px; }
+        .keypad button { padding:14px; font-size:1.05em; background: #f1f1f5; border-radius:8px; border:1px solid var(--border); cursor:pointer; }
+        .keypad .op { background: #e8f0ff; color: var(--res-text); font-weight:700; }
+        .history { margin-top:10px; border-top:1px dashed rgba(0,0,0,0.06); padding-top:8px; font-size:0.9em; text-align:left; }
+        .history-list { display:flex; gap:6px; flex-wrap:wrap; margin-top:6px; }
+        .history-item { background: rgba(0,0,0,0.04); padding:6px 8px; border-radius:999px; cursor:pointer; font-size:0.85em; }
+        .history-controls { margin-top:6px; display:flex; gap:8px; }
+        @media (max-width: 480px) {
+            .row { flex-direction: column; }
+            .controls { flex-direction: column; }
+            .keypad button { padding:12px; font-size:1em; }
+        }
     </style>
 </head>
 <body data-theme="light">
@@ -89,10 +111,80 @@
         <div style="font-weight: bold; opacity: 0.7; font-size: 0.9em;">Celková cena:</div>
         <div class="total" id="totalPrice">0.00 €</div>
         <div id="breakdown" class="breakdown">Zadajte údaje...</div>
+
+        <!-- Jemné vysvetlivky (small notes) -->
+        <div class="small-note" id="explanation">
+            Výpočty: Materiál = (váha v g / 1000) × cena/kg × 1.1 (rezerva 10 %). Prevádzka stroja = čas tlače × sadzba stroja (vyššia pre materiály s vysokou teplotou). Práca = minúty práce / 60 × hodinová sadzba. Nakoniec sa pripočíta fixný poplatok a aplikuje marža.
+        </div>
+    </div>
+
+    <!-- Mini kalkulačka, zobrazí sa po rozbalení -->
+    <div class="mini-calc" id="miniCalc" aria-hidden="true">
+        <div class="calc-top">
+            <label style="font-weight:bold; margin-top:0; margin-bottom:0;">Malá kalkulačka</label>
+            <div style="margin-left:8px; color:var(--muted); font-size:0.9em;">(povoľujem písanie z klávesnice, iba čísla a operátory)</div>
+        </div>
+
+        <!-- input is editable now, but keyboard input is filtered in JS -->
+        <input type="text" id="calcExpr" placeholder="Použi tlačidlá alebo napíš výraz..." aria-label="Výraz">
+
+        <div class="keypad" role="group" aria-label="Numerická klávesnica">
+            <!-- Row 1 -->
+            <button onclick="kbdInsert('7')">7</button>
+            <button onclick="kbdInsert('8')">8</button>
+            <button onclick="kbdInsert('9')">9</button>
+            <button class="op" onclick="kbdInsert('/')">÷</button>
+
+            <!-- Row 2 -->
+            <button onclick="kbdInsert('4')">4</button>
+            <button onclick="kbdInsert('5')">5</button>
+            <button onclick="kbdInsert('6')">6</button>
+            <button class="op" onclick="kbdInsert('*')">×</button>
+
+            <!-- Row 3 -->
+            <button onclick="kbdInsert('1')">1</button>
+            <button onclick="kbdInsert('2')">2</button>
+            <button onclick="kbdInsert('3')">3</button>
+            <button class="op" onclick="kbdInsert('-')">−</button>
+
+            <!-- Row 4 -->
+            <button onclick="kbdInsert('0')">0</button>
+            <button onclick="kbdInsert('.')">.</button>
+            <button onclick="kbdInsert('%')">%</button>
+            <button class="op" onclick="kbdInsert('+')">+</button>
+
+            <!-- Row 5 -->
+            <button onclick="kbdInsert('(')">(</button>
+            <button onclick="kbdInsert(')')">)</button>
+            <button onclick="backspace()" title="Backspace">⌫</button>
+            <button onclick="clearCalc()" title="Vymazať">C</button>
+        </div>
+
+        <div class="calc-controls">
+            <button onclick="evaluateExpression()">= Výpočet</button>
+            <button onclick="useSelectionAsExpression()">Použiť z políčka (váha/1000)</button>
+            <button onclick="saveCurrentToHistory()">Uložiť do histórie</button>
+        </div>
+
+        <div class="calc-result" id="calcResult" aria-live="polite"></div>
+
+        <div class="history" id="historySection" aria-live="polite">
+            <div style="font-weight:700; color:var(--muted);">História:</div>
+            <div class="history-list" id="historyList"></div>
+            <div class="history-controls">
+                <button onclick="clearHistory()" style="background:#ffdede;color:#800">Vymazať históriu</button>
+                <button onclick="pasteLastHistory()" style="background:#e6f7e6;color:#060">Použiť poslednú</button>
+            </div>
+        </div>
+
+        <div class="small-note" style="margin-top:6px;">
+            Upozornenie: povolené znaky pri písaní sú čísla 0–9, bodka, + - * / ( ) a %, percentá sa spracujú ako delenie 100 (napr. 50% = 0.5).
+        </div>
     </div>
 
     <div class="controls">
         <button class="btn-reset" onclick="reset()">Vynulovať</button>
+        <button class="btn-mini" onclick="toggleMiniCalc()">Malá kalkulačka</button>
         <button class="btn-theme" onclick="toggleTheme()">Režim 🌓</button>
     </div>
 </div>
@@ -170,7 +262,269 @@ function calculate() {
         document.getElementById('breakdown').innerText = "Zadajte údaje zo Slicera...";
     }
 }
+
+// ----- Mini kalkulačka & pomocné funkcie -----
+const HISTORY_KEY = 'miniCalcHistory_v1';
+const HISTORY_LIMIT = 10;
+
+function toggleMiniCalc() {
+    const mini = document.getElementById('miniCalc');
+    const isHidden = mini.style.display === 'none' || mini.style.display === '';
+    mini.style.display = isHidden ? 'block' : 'none';
+    mini.setAttribute('aria-hidden', !isHidden);
+    if (isHidden) {
+        setTimeout(() => document.getElementById('calcExpr').focus(), 100);
+    }
+    renderHistory();
+}
+
+function kbdInsert(ch) {
+    // allowed characters from keypad: digits, ., + - * / ( ) %
+    const allowed = /^[0-9+\-*/().%]$/;
+    if (!allowed.test(ch)) return;
+    const input = document.getElementById('calcExpr');
+    const start = input.selectionStart || input.value.length;
+    const end = input.selectionEnd || input.value.length;
+    const before = input.value.slice(0, start);
+    const after = input.value.slice(end);
+    input.value = before + ch + after;
+    const pos = before.length + 1;
+    input.setSelectionRange(pos, pos);
+    document.getElementById('calcResult').innerText = '';
+}
+
+function backspace() {
+    const input = document.getElementById('calcExpr');
+    const start = input.selectionStart || input.value.length;
+    const end = input.selectionEnd || input.value.length;
+    if (start === end && start > 0) {
+        input.value = input.value.slice(0, start - 1) + input.value.slice(end);
+        input.setSelectionRange(start - 1, start - 1);
+    } else {
+        input.value = input.value.slice(0, start) + input.value.slice(end);
+        input.setSelectionRange(start, start);
+    }
+}
+
+function clearCalc() {
+    document.getElementById('calcExpr').value = '';
+    document.getElementById('calcResult').innerText = '';
+}
+
+function useSelectionAsExpression() {
+    // Helper: put weight/1000 * price * 1.1 into calc input for quick material calc
+    const weight = parseFloat(document.getElementById('weight').value) || 0;
+    const price = parseFloat(document.getElementById('matPriceInput').value) || 0;
+    const expr = `${weight}/1000*${price}*1.1`;
+    document.getElementById('calcExpr').value = expr;
+    document.getElementById('calcResult').innerText = '';
+}
+
+// Convert '50%' => (50/100)
+function transformPercentages(expr) {
+    // replace all occurrences like 12.5% or 50% with (12.5/100)
+    return expr.replace(/(\d+(\.\d+)?)%/g, '($1/100)');
+}
+
+function isExpressionSafe(expr) {
+    // After % transformation, allowed chars: digits, whitespace, + - * / ( ) .
+    return /^[0-9+\-*/().\s]+$/.test(expr);
+}
+
+function evaluateExpression() {
+    const out = document.getElementById('calcResult');
+    const raw = document.getElementById('calcExpr').value.trim();
+    if (!raw) {
+        out.innerText = "Zadajte výraz.";
+        return;
+    }
+
+    // transform percent tokens
+    const transformed = transformPercentages(raw);
+
+    if (!isExpressionSafe(transformed)) {
+        out.innerText = "Výraz obsahuje nepovolené znaky.";
+        return;
+    }
+
+    try {
+        // Evaluate safely limited expression
+        // eslint-disable-next-line no-new-func
+        const result = Function('"use strict"; return (' + transformed + ')')();
+        if (typeof result === 'number' && isFinite(result)) {
+            out.innerText = "= " + result;
+            pushHistory(raw, result);
+        } else {
+            out.innerText = "Výsledok nie je číslo.";
+        }
+    } catch (e) {
+        out.innerText = "Chybný výraz.";
+    }
+}
+
+// ----- História (localStorage) -----
+function getHistory() {
+    try {
+        const raw = localStorage.getItem(HISTORY_KEY);
+        if (!raw) return [];
+        return JSON.parse(raw);
+    } catch (e) {
+        return [];
+    }
+}
+
+function saveHistory(arr) {
+    try {
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(arr.slice(0, HISTORY_LIMIT)));
+    } catch (e) {
+        // ignore
+    }
+}
+
+function pushHistory(expr, result) {
+    const hist = getHistory();
+    // avoid duplicates (keep most recent)
+    const existingIndex = hist.findIndex(h => h.expr === expr);
+    if (existingIndex !== -1) hist.splice(existingIndex, 1);
+    hist.unshift({ expr, result, at: new Date().toISOString() });
+    saveHistory(hist);
+    renderHistory();
+}
+
+function renderHistory() {
+    const list = document.getElementById('historyList');
+    list.innerHTML = '';
+    const hist = getHistory();
+    if (!hist || hist.length === 0) {
+        list.innerHTML = '<div style="color:var(--muted); font-size:0.9em;">Žiadne záznamy.</div>';
+        return;
+    }
+    hist.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = 'history-item';
+        btn.type = 'button';
+        btn.title = item.expr + ' = ' + item.result;
+        btn.innerText = item.expr;
+        btn.onclick = () => {
+            document.getElementById('calcExpr').value = item.expr;
+            document.getElementById('calcResult').innerText = '= ' + item.result;
+            document.getElementById('calcExpr').focus();
+        };
+        list.appendChild(btn);
+    });
+}
+
+function clearHistory() {
+    localStorage.removeItem(HISTORY_KEY);
+    renderHistory();
+}
+
+function pasteLastHistory() {
+    const hist = getHistory();
+    if (hist && hist.length > 0) {
+        document.getElementById('calcExpr').value = hist[0].expr;
+        document.getElementById('calcResult').innerText = '= ' + hist[0].result;
+    }
+}
+
+function saveCurrentToHistory() {
+    const expr = document.getElementById('calcExpr').value.trim();
+    if (!expr) return;
+    // attempt to evaluate to save result
+    const transformed = transformPercentages(expr);
+    if (!isExpressionSafe(transformed)) {
+        document.getElementById('calcResult').innerText = "Neuložené: výraz obsahuje nepovolené znaky.";
+        return;
+    }
+    try {
+        // eslint-disable-next-line no-new-func
+        const result = Function('"use strict"; return (' + transformed + ')')();
+        if (typeof result === 'number' && isFinite(result)) {
+            pushHistory(expr, result);
+            document.getElementById('calcResult').innerText = 'Uložené = ' + result;
+        } else {
+            document.getElementById('calcResult').innerText = 'Neuložené: výsledok nie je číslo.';
+        }
+    } catch (e) {
+        document.getElementById('calcResult').innerText = 'Neuložené: chybný výraz.';
+    }
+}
+
+// Initialize history on load
+renderHistory();
+
+// ----- New: allow keyboard typing but block letters -----
+// Attach handlers to the calculator input so the user can type digits and operators,
+// but letters will be blocked; paste is sanitized.
+(function attachCalcInputHandlers() {
+    const input = document.getElementById('calcExpr');
+
+    input.addEventListener('keydown', function(e) {
+        // allow navigation and control keys
+        const navKeys = ['Backspace','Delete','ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End','Tab'];
+        if (navKeys.includes(e.key)) {
+            if (e.key === 'Enter') { // Enter should evaluate
+                // handled below, but if user presses Enter, we evaluate
+            }
+            return;
+        }
+
+        // allow Enter to evaluate
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            evaluateExpression();
+            return;
+        }
+
+        // allow common clipboard shortcuts
+        if ((e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'v' || e.key === 'x' || e.key === 'a')) {
+            return;
+        }
+
+        // Allow only single-character keys that are digits or operators:
+        // digits 0-9, + - * / . % ( )
+        if (/^[0-9+\-*/().%]$/.test(e.key)) {
+            return; // allowed
+        }
+
+        // Otherwise block (this prevents letters)
+        e.preventDefault();
+    });
+
+    // sanitize on input (covers IME and other input methods)
+    input.addEventListener('input', function() {
+        const cleaned = this.value.replace(/[^0-9+\-*/().%\s]/g, '');
+        if (this.value !== cleaned) {
+            const pos = this.selectionStart - (this.value.length - cleaned.length);
+            this.value = cleaned;
+            this.setSelectionRange(pos >= 0 ? pos : 0, pos >= 0 ? pos : 0);
+        }
+    });
+
+    // sanitize paste
+    input.addEventListener('paste', function(e) {
+        e.preventDefault();
+        const text = (e.clipboardData || window.clipboardData).getData('text') || '';
+        const cleaned = text.replace(/[^0-9+\-*/().%\s]/g, '');
+        const start = this.selectionStart || 0;
+        const end = this.selectionEnd || 0;
+        const before = this.value.slice(0, start);
+        const after = this.value.slice(end);
+        this.value = before + cleaned + after;
+        const pos = before.length + cleaned.length;
+        this.setSelectionRange(pos, pos);
+        this.dispatchEvent(new Event('input', { bubbles: true })); // ensure input handlers run
+    });
+
+    // optional: prevent drop of arbitrary text into field
+    input.addEventListener('drop', function(e) {
+        e.preventDefault();
+    });
+})();
+
+// Inicializácia hlavnej kalkulácie
 calculate();
+
 </script>
 
 </body>
