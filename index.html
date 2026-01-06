@@ -87,4 +87,91 @@
     <div class="result">
         <div id="tempBadge" class="elec-tag"></div>
         <div style="font-weight: bold; opacity: 0.7; font-size: 0.9em;">Celková cena:</div>
-        <div class="total"
+        <div class="total" id="totalPrice">0.00 €</div>
+        <div id="breakdown" class="breakdown">Zadajte údaje...</div>
+    </div>
+
+    <div class="controls">
+        <button class="btn-reset" onclick="reset()">Vynulovať</button>
+        <button class="btn-theme" onclick="toggleTheme()">Režim 🌓</button>
+    </div>
+</div>
+
+<script>
+// Funkcia, ktorá sa spustí pri zmene materiálu v menu
+function updateMaterialPrice() {
+    const matSelect = document.getElementById('matType');
+    const selectedPrice = matSelect.value;
+    document.getElementById('matPriceInput').value = selectedPrice;
+    calculate();
+}
+
+function toggleTheme() {
+    const body = document.body;
+    body.setAttribute('data-theme', body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+}
+
+function reset() {
+    document.getElementById('matType').selectedIndex = 0;
+    document.getElementById('matPriceInput').value = 15;
+    document.getElementById('printTime').value = 0;
+    document.getElementById('weight').value = 0;
+    document.getElementById('workTime').value = 10;
+    document.getElementById('adminFee').value = 1.50;
+    document.getElementById('margin').value = 20;
+    calculate();
+}
+
+function calculate() {
+    const matSelect = document.getElementById('matType');
+    const tempType = matSelect.options[matSelect.selectedIndex].getAttribute('data-temp');
+    
+    // Konštanty (Sadzby)
+    const machineBase = 0.60; 
+    const highTempExtra = 0.15; 
+    const laborRate = 10.00; 
+
+    const printTime = parseFloat(document.getElementById('printTime').value) || 0;
+    const weight = parseFloat(document.getElementById('weight').value) || 0;
+    const matPrice = parseFloat(document.getElementById('matPriceInput').value) || 0;
+    const workTimeMin = parseFloat(document.getElementById('workTime').value) || 0;
+    const marginPercent = parseFloat(document.getElementById('margin').value) || 0;
+    const adminFee = parseFloat(document.getElementById('adminFee').value) || 0;
+
+    const currentMachineRate = (tempType === 'high') ? (machineBase + highTempExtra) : machineBase;
+    
+    const costMachine = printTime * currentMachineRate;
+    const costMat = (weight / 1000) * matPrice * 1.1; 
+    const costLabor = (workTimeMin / 60) * laborRate;
+    
+    const totalCosts = costMachine + costMat + costLabor + adminFee;
+    const finalPrice = totalCosts * (1 + (marginPercent / 100));
+
+    const badge = document.getElementById('tempBadge');
+    if(tempType === 'high') {
+        badge.innerText = "⚡ VYSOKÁ TEPLOTA (0.75€/h)";
+        badge.className = "elec-tag high-temp";
+    } else {
+        badge.innerText = "❄️ BEŽNÁ TEPLOTA (0.60€/h)";
+        badge.className = "elec-tag";
+    }
+
+    if (finalPrice > 0) {
+        document.getElementById('totalPrice').innerText = finalPrice.toFixed(2) + " €";
+        document.getElementById('breakdown').innerHTML = `
+            • Materiál (${matPrice.toFixed(2)}€/kg + 10%): ${costMat.toFixed(2)} €<br>
+            • Prevádzka stroja: ${costMachine.toFixed(2)} €<br>
+            • Práca a príprava: ${costLabor.toFixed(2)} €<br>
+            • Fixný poplatok: ${adminFee.toFixed(2)} €<br>
+            <strong>• Náklady spolu: ${totalCosts.toFixed(2)} €</strong>
+        `;
+    } else {
+        document.getElementById('totalPrice').innerText = "0.00 €";
+        document.getElementById('breakdown').innerText = "Zadajte údaje zo Slicera...";
+    }
+}
+calculate();
+</script>
+
+</body>
+</html>
