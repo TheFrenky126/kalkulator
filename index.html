@@ -220,15 +220,58 @@
         .btn-print:hover { background: var(--accent-hover); }
 
         /* --- 6. PRINT STYLES --- */
+        @media screen {
+            .print-only { display: none; }
+        }
+
         @media print {
-            body { background: white; color: black; padding: 0; }
-            .actions, .theme-toggle { display: none !important; }
-            .container { display: block; }
-            .card { box-shadow: none; border: 1px solid #ccc; margin-bottom: 20px; break-inside: avoid; }
-            input, select { border: none; background: transparent; padding: 0; font-weight: bold; -webkit-appearance: none; }
-            label { opacity: 0.7; }
-            .result-box { background: #f9f9f9 !important; border: 1px solid #eee; }
-            h2 { color: black; border-bottom-color: black; }
+            /* Hide app interface */
+            .container, .header, .actions { display: none !important; }
+            
+            /* Show quote template */
+            .print-only { display: block !important; width: 100%; }
+            
+            body { 
+                background: white; 
+                color: #1f2937; 
+                padding: 40px; 
+                font-family: 'Inter', sans-serif;
+                display: block; /* Reset flex layout */
+            }
+
+            .quote-header { 
+                display: flex; 
+                justify-content: space-between; 
+                align-items: flex-start; 
+                margin-bottom: 50px; 
+                border-bottom: 2px solid #e5e7eb; 
+                padding-bottom: 20px; 
+            }
+            
+            .quote-logo img { max-height: 60px; }
+            
+            .quote-info { text-align: right; }
+            .quote-title { font-size: 24px; font-weight: 800; color: #111; margin: 0 0 5px 0; text-transform: uppercase; letter-spacing: 1px; }
+            .quote-date { color: #6b7280; font-size: 14px; }
+
+            .client-info { margin-bottom: 40px; }
+            .client-label { font-size: 12px; color: #6b7280; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
+            .client-val { font-size: 20px; font-weight: 600; margin-top: 5px; color: #111; }
+
+            table.quote-table { width: 100%; border-collapse: collapse; margin-bottom: 40px; }
+            table.quote-table th { text-align: left; padding: 15px 10px; border-bottom: 2px solid #111; font-size: 12px; text-transform: uppercase; font-weight: 700; }
+            table.quote-table td { padding: 15px 10px; border-bottom: 1px solid #e5e7eb; font-size: 14px; }
+            table.quote-table td.num { text-align: right; }
+            table.quote-table tr:last-child td { border-bottom: none; }
+            
+            .quote-total-section { text-align: right; margin-top: 20px; padding-top: 20px; border-top: 2px solid #e5e7eb; }
+            .quote-total-label { font-weight: 600; color: #6b7280; font-size: 14px; margin-right: 15px; }
+            .quote-total-val { font-weight: 800; font-size: 28px; color: #111; }
+
+            .quote-footer { 
+                position: fixed; bottom: 40px; left: 0; right: 0; 
+                text-align: center; font-size: 12px; color: #9ca3af; 
+            }
         }
     </style>
 </head>
@@ -368,6 +411,52 @@
 
     </main>
 
+    <!-- ŠABLÓNA PRE TLAČ (CENOVÁ PONUKA) -->
+    <div class="print-only">
+        <div class="quote-header">
+            <div class="quote-logo">
+                <img src="https://pro3d.sk/wp-content/uploads/2023/10/logo_pro3d_horizontal.png" alt="Pro3D Logo">
+            </div>
+            <div class="quote-info">
+                <h1 class="quote-title">Cenová ponuka</h1>
+                <div class="quote-date" id="printDate">Dátum: </div>
+            </div>
+        </div>
+
+        <div class="client-info">
+            <div class="client-label">Názov zákazky / Projekt</div>
+            <div class="client-val" id="printJobName"></div>
+        </div>
+
+        <table class="quote-table">
+            <thead>
+                <tr>
+                    <th>Položka</th>
+                    <th class="num">Množstvo</th>
+                    <th class="num">Cena za ks</th>
+                    <th class="num">Spolu</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>3D Tlač - <span id="printMaterial"></span></td>
+                    <td class="num"><span id="printQty"></span> ks</td>
+                    <td class="num"><span id="printUnitPrice"></span> €</td>
+                    <td class="num"><span id="printTotalPrice"></span> €</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="quote-total-section">
+            <span class="quote-total-label">CELKOM K ÚHRADE</span>
+            <span class="quote-total-val"><span id="printFinalTotal"></span> €</span>
+        </div>
+
+        <div class="quote-footer">
+            Platnosť cenovej ponuky je 14 dní. Dokument vygenerovaný systémom Pro3D.sk
+        </div>
+    </div>
+
 <script>
 /**
  * LOGIKA KALKULAČKY
@@ -471,6 +560,15 @@ const App = {
         this.elements.finalPriceDisplay = document.getElementById('finalPriceDisplay');
         this.elements.breakdownDisplay = document.getElementById('breakdownDisplay');
 
+        // Print Elements
+        this.elements.printDate = document.getElementById('printDate');
+        this.elements.printJobName = document.getElementById('printJobName');
+        this.elements.printMaterial = document.getElementById('printMaterial');
+        this.elements.printQty = document.getElementById('printQty');
+        this.elements.printUnitPrice = document.getElementById('printUnitPrice');
+        this.elements.printTotalPrice = document.getElementById('printTotalPrice');
+        this.elements.printFinalTotal = document.getElementById('printFinalTotal');
+
         // Buttons
         this.elements.btnTheme = document.getElementById('btnTheme');
         this.elements.btnReset = document.getElementById('btnReset');
@@ -572,6 +670,22 @@ const App = {
                 <span>${results.totalProfit.toFixed(2)} €</span>
             </div>
         `;
+
+        // Update Print View
+        const date = new Date().toLocaleDateString('sk-SK');
+        this.elements.printDate.textContent = `Dátum: ${date}`;
+        this.elements.printJobName.textContent = this.elements.jobName.value || "Bez názvu";
+        
+        const matText = this.elements.materialSelect.options[this.elements.materialSelect.selectedIndex].text;
+        this.elements.printMaterial.textContent = matText.split('(')[0].trim(); // Odstráni cenu zo zátvorky
+        
+        this.elements.printQty.textContent = count;
+        
+        // Jednotková cena pre zákazníka (vydelená celková suma počtom kusov)
+        const unitPriceForCustomer = results.roundedPrice / count;
+        this.elements.printUnitPrice.textContent = unitPriceForCustomer.toFixed(2);
+        this.elements.printTotalPrice.textContent = results.roundedPrice.toFixed(2);
+        this.elements.printFinalTotal.textContent = results.roundedPrice.toFixed(2);
     },
 
     toggleTheme() {
