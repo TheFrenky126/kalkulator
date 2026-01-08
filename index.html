@@ -123,6 +123,102 @@
             box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
         }
 
+        /* --- JOB NAME FANCY INPUT --- */
+        .job-name-wrapper { position: relative; margin-top: 5px; }
+        .job-name-wrapper input {
+            padding-left: 35px;
+            font-size: 1.6rem;
+            font-weight: 800;
+            border: none;
+            border-bottom: 2px solid transparent;
+            background: transparent;
+            transition: var(--transition);
+            border-radius: 0;
+            padding-bottom: 5px;
+            color: var(--text-main);
+        }
+        .job-name-wrapper input:focus {
+            border-color: var(--primary);
+            box-shadow: none;
+        }
+        .job-name-icon {
+            position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+            width: 24px; height: 24px; color: var(--text-muted); transition: var(--transition);
+        }
+        .job-name-wrapper input:focus ~ .job-name-icon { color: var(--primary); }
+
+        /* --- STEPPER (Vylepšené šípky) --- */
+        .stepper-wrapper {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--input-bg);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+        .stepper-wrapper:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+        .stepper-wrapper input {
+            border: none;
+            background: transparent;
+            text-align: center;
+            border-radius: 0;
+            width: 100%;
+            -moz-appearance: textfield; /* Firefox */
+        }
+        .stepper-wrapper input:focus {
+            box-shadow: none;
+        }
+        .stepper-wrapper input::-webkit-outer-spin-button,
+        .stepper-wrapper input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .stepper-btn {
+            padding: 0;
+            width: 44px; /* Dostatočne veľká plocha pre prst */
+            height: 44px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+        .stepper-btn.reset-btn {
+            width: 30px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border-right: 1px solid var(--border);
+            color: var(--text-muted);
+            opacity: 0.7;
+            background: rgba(0,0,0,0.1); /* Výraznejšie pozadie */
+            font-weight: 800;
+            border-radius: 8px 0 0 8px;
+        }
+        [data-theme="dark"] .stepper-btn.reset-btn {
+            background: rgba(255,255,255,0.15); /* Výraznejšie v tmavom režime */
+        }
+        .stepper-btn.reset-btn:hover { color: var(--danger); background: rgba(239, 68, 68, 0.05); opacity: 1; }
+        .stepper-btn:hover {
+            background: rgba(0,0,0,0.05);
+            color: var(--primary);
+        }
+        .stepper-btn:active {
+            background: rgba(0,0,0,0.1);
+            transform: scale(0.95);
+        }
+        .stepper-btn svg {
+            width: 20px;
+            height: 20px;
+            stroke-width: 2.5;
+        }
+
         .row { display: flex; gap: 15px; }
         .row > div { flex: 1; }
         
@@ -219,6 +315,108 @@
         .btn-print { background: var(--accent); color: white; width: 100%; justify-content: center; margin-top: 10px; }
         .btn-print:hover { background: var(--accent-hover); }
 
+        /* --- MINI CALCULATOR --- */
+        .mini-calc-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .mini-calc-overlay.active {
+            opacity: 1;
+        }
+        .mini-calc-box {
+            position: fixed;
+            bottom: 20px; right: 20px; /* Predvolená pozícia */
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            width: 320px;
+            max-width: 95%;
+            border: 1px solid var(--border);
+            pointer-events: auto;
+            transform: translateY(20px);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .mini-calc-overlay.active .mini-calc-box {
+            transform: translateY(0);
+        }
+        .mini-calc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            cursor: move; /* Indikuje možnosť presúvania */
+            user-select: none;
+        }
+        .mini-calc-header h3 { margin: 0; font-size: 1.1rem; color: var(--text-main); }
+        .btn-close-calc { background: transparent; border: none; font-size: 1.5rem; line-height: 1; padding: 0; color: var(--text-muted); cursor: pointer; }
+        
+        #miniCalcDisplay {
+            width: 100%; margin-bottom: 15px; text-align: right; font-size: 1.8rem; font-weight: 700; letter-spacing: 1px;
+            background: var(--input-bg); border: 1px solid var(--border); padding: 15px; border-radius: 8px;
+        }
+        .mini-calc-history {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .history-item {
+            display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); padding: 4px 8px; border-radius: 4px; background: rgba(0,0,0,0.02);
+        }
+        .history-item span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-right: 10px; }
+        .history-item strong { white-space: nowrap; color: var(--text-main); font-weight: 600; }
+        .mini-calc-keys { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .mini-calc-keys button {
+            padding: 15px 0; font-size: 1.2rem; border-radius: 8px; border: 1px solid var(--border);
+            background: var(--bg); color: var(--text-main); justify-content: center; cursor: pointer;
+        }
+        .mini-calc-keys button:hover { background: var(--border); }
+        .key-clear { background-color: var(--danger) !important; color: white !important; border-color: var(--danger) !important; }
+        .key-equal { background-color: var(--primary) !important; color: white !important; border-color: var(--primary) !important; grid-row: span 2; height: 100%; }
+        .key-zero { grid-column: span 2; width: 100%; }
+
+        /* --- MATERIAL MANAGER --- */
+        .btn-link {
+            background: none; border: none; padding: 0; color: var(--primary);
+            font-size: 0.85rem; cursor: pointer; text-decoration: underline;
+            margin-top: 5px; display: inline-block;
+        }
+        .btn-link:hover { color: var(--primary-hover); }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 2000;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s;
+            backdrop-filter: blur(3px);
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        
+        .modal-box {
+            background: var(--card-bg); width: 400px; max-width: 90%;
+            border-radius: var(--radius); padding: 25px;
+            box-shadow: var(--shadow);
+            transform: translateY(20px); transition: transform 0.3s;
+            max-height: 85vh; display: flex; flex-direction: column;
+        }
+        .modal-overlay.active .modal-box { transform: translateY(0); }
+
+        .mat-list { overflow-y: auto; flex: 1; margin-bottom: 20px; border: 1px solid var(--border); border-radius: 8px; max-height: 300px; }
+        .mat-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; border-bottom: 1px solid var(--border); background: var(--bg); }
+        .mat-item:last-child { border-bottom: none; }
+        .mat-info { display: flex; flex-direction: column; }
+        .mat-name { font-weight: 600; font-size: 0.9rem; }
+        .mat-meta { font-size: 0.75rem; color: var(--text-muted); }
+        .btn-delete-mat { color: var(--danger); background: rgba(239, 68, 68, 0.1); border: none; width: 30px; height: 30px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .btn-delete-mat:hover { background: var(--danger); color: white; }
+        .btn-edit-mat { color: var(--primary); background: rgba(99, 102, 241, 0.1); border: none; width: 30px; height: 30px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; margin-right: 5px; }
+        .btn-edit-mat:hover { background: var(--primary); color: white; }
+
         /* --- 6. PRINT STYLES --- */
         @media screen {
             .print-only { display: none; }
@@ -290,54 +488,80 @@
         <!-- SEKICIA 1: VÝROBA -->
         <section class="card">
             <h2>
-                1. Výroba (1 ks)
+                1. Výroba (1 podložka)
                 <span id="machineRateTag" class="tag low">PLA/PETG</span>
             </h2>
 
             <div class="form-group">
-                <label for="jobName">Názov zákazky</label>
-                <input type="text" id="jobName" placeholder="Napr. Držiak na mobil">
+                <div class="job-name-wrapper">
+                    <input type="text" id="jobName" placeholder="Napr. Držiak na mobil">
+                    <svg class="job-name-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                </div>
             </div>
 
             <div class="form-group">
                 <label for="materialSelect">Materiál</label>
                 <select id="materialSelect">
-                    <optgroup label="Standard">
-                        <option value="15" data-temp="low">PLA Standard (15€)</option>
-                        <option value="15" data-temp="low">PETG Standard (15€)</option>
-                        <option value="20" data-temp="high">ASA Standard (20€)</option>
-                        <option value="30" data-temp="high">PC Standard (30€)</option>
-                        <option value="25" data-temp="low">TPU Standard (25€)</option>
-                    </optgroup>
-                    <optgroup label="Profi">
-                        <option value="20" data-temp="low">PLA Profi (20€)</option>
-                        <option value="20" data-temp="low">PETG Profi (20€)</option>
-                        <option value="25" data-temp="high">ASA Profi (25€)</option>
-                        <option value="40" data-temp="high">PC Profi (40€)</option>
-                        <option value="40" data-temp="low">TPU Profi (40€)</option>
-                    </optgroup>
+                    <!-- Populated by JS -->
                 </select>
+                <button type="button" class="btn-link" id="btnManageMaterials">⚙️ Spravovať materiály (Pridať/Odobrať)</button>
             </div>
 
             <div class="row">
                 <div class="form-group">
                     <label for="materialPrice">Cena (€/kg)</label>
-                    <input type="number" id="materialPrice" value="15" step="0.1">
+                    <div class="stepper-wrapper">
+                        <button type="button" class="stepper-btn reset-btn" data-action="reset" data-target="materialPrice">0</button>
+                        <button type="button" class="stepper-btn" data-action="decrement" data-target="materialPrice">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4" /></svg>
+                        </button>
+                        <input type="number" id="materialPrice" value="15" step="0.1">
+                        <button type="button" class="stepper-btn" data-action="increment" data-target="materialPrice">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                        </button>
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label for="weight">Váha (g)</label>
-                    <input type="number" id="weight" value="50" placeholder="0">
+                    <label for="weight">Celková váha (g)</label>
+                    <div class="stepper-wrapper">
+                        <button type="button" class="stepper-btn reset-btn" data-action="reset" data-target="weight">0</button>
+                        <button type="button" class="stepper-btn" data-action="decrement" data-target="weight">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4" /></svg>
+                        </button>
+                        <input type="number" id="weight" value="50" placeholder="0">
+                        <button type="button" class="stepper-btn" data-action="increment" data-target="weight">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                        </button>
+                    </div>
                 </div>
             </div>
 
             <div class="row">
                 <div class="form-group">
                     <label for="printTime">Čas tlače (h)</label>
-                    <input type="number" id="printTime" value="2.5" step="0.1" placeholder="0.0">
+                    <div class="stepper-wrapper">
+                        <button type="button" class="stepper-btn reset-btn" data-action="reset" data-target="printTime">0</button>
+                        <button type="button" class="stepper-btn" data-action="decrement" data-target="printTime">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4" /></svg>
+                        </button>
+                        <input type="number" id="printTime" value="2.5" step="0.1" placeholder="0.0">
+                        <button type="button" class="stepper-btn" data-action="increment" data-target="printTime">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                        </button>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="adminFee">Fix. poplatok (€)</label>
-                    <input type="number" id="adminFee" value="0" step="0.1">
+                    <div class="stepper-wrapper">
+                        <button type="button" class="stepper-btn reset-btn" data-action="reset" data-target="adminFee">0</button>
+                        <button type="button" class="stepper-btn" data-action="decrement" data-target="adminFee">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4" /></svg>
+                        </button>
+                        <input type="number" id="adminFee" value="0" step="0.1">
+                        <button type="button" class="stepper-btn" data-action="increment" data-target="adminFee">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -349,7 +573,7 @@
             </div>
 
             <div class="result-box">
-                <div class="result-label">NÁKLAD NA 1 KUS</div>
+                <div class="result-label">NÁKLAD NA 1 PODLOŽKU</div>
                 <div class="result-value" id="unitCostDisplay">0.00 €</div>
             </div>
         </section>
@@ -360,23 +584,59 @@
 
             <div class="row">
                 <div class="form-group">
-                    <label for="multiplier">Počet kusov</label>
-                    <input type="number" id="multiplier" value="1" min="1">
+                    <label for="multiplier">Počet podložiek</label>
+                    <div class="stepper-wrapper">
+                        <button type="button" class="stepper-btn reset-btn" data-action="reset" data-target="multiplier">0</button>
+                        <button type="button" class="stepper-btn" data-action="decrement" data-target="multiplier">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4" /></svg>
+                        </button>
+                        <input type="number" id="multiplier" value="1" min="1">
+                        <button type="button" class="stepper-btn" data-action="increment" data-target="multiplier">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                        </button>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="workTime">Tvoja práca (min)</label>
-                    <input type="number" id="workTime" value="0">
+                    <div class="stepper-wrapper">
+                        <button type="button" class="stepper-btn reset-btn" data-action="reset" data-target="workTime">0</button>
+                        <button type="button" class="stepper-btn" data-action="decrement" data-target="workTime">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4" /></svg>
+                        </button>
+                        <input type="number" id="workTime" value="0">
+                        <button type="button" class="stepper-btn" data-action="increment" data-target="workTime">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                        </button>
+                    </div>
                 </div>
             </div>
             
             <div class="row">
                 <div class="form-group">
                     <label for="margin">Marža (%)</label>
-                    <input type="number" id="margin" value="20">
+                    <div class="stepper-wrapper">
+                        <button type="button" class="stepper-btn reset-btn" data-action="reset" data-target="margin">0</button>
+                        <button type="button" class="stepper-btn" data-action="decrement" data-target="margin">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4" /></svg>
+                        </button>
+                        <input type="number" id="margin" value="20">
+                        <button type="button" class="stepper-btn" data-action="increment" data-target="margin">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                        </button>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="tax">Daň / DPH (%)</label>
-                    <input type="number" id="tax" value="0">
+                    <div class="stepper-wrapper">
+                        <button type="button" class="stepper-btn reset-btn" data-action="reset" data-target="tax">0</button>
+                        <button type="button" class="stepper-btn" data-action="decrement" data-target="tax">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4" /></svg>
+                        </button>
+                        <input type="number" id="tax" value="0">
+                        <button type="button" class="stepper-btn" data-action="increment" data-target="tax">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -405,8 +665,10 @@
         <!-- OVLÁDANIE -->
         <div class="actions full-width">
             <button class="btn-secondary" id="btnTheme">🌓 Režim</button>
+            <button class="btn-secondary" id="btnMiniCalc">🧮 Kalkulačka</button>
             <button class="btn-secondary" id="btnReset" style="background: var(--danger);">Vynulovať</button>
-            <button class="btn-print" onclick="window.print()">🖨️ Stiahnuť cenovú ponuku (PDF)</button>
+            <button class="btn-secondary" id="btnFactoryReset" style="background: #4b5563;">🏭 Factory Reset</button>
+            <button class="btn-print" onclick="alert('Táto funkcia je v štádiu riešenia a slúži len na testovanie.'); window.print()">🖨️ Stiahnuť cenovú ponuku (PDF)</button>
         </div>
 
     </main>
@@ -454,6 +716,124 @@
 
         <div class="quote-footer">
             Platnosť cenovej ponuky je 14 dní. Dokument vygenerovaný systémom Pro3D.sk
+        </div>
+    </div>
+
+    <!-- MINI KALKULAČKA MODAL -->
+    <div class="mini-calc-overlay" id="miniCalcOverlay">
+        <div class="mini-calc-box">
+            <div class="mini-calc-header">
+                <h3>Rýchle výpočty</h3>
+                <button class="btn-close-calc" id="closeMiniCalc">×</button>
+            </div>
+            <input type="text" id="miniCalcDisplay" readonly value="0">
+            <div class="mini-calc-history" id="miniCalcHistory"></div>
+            <div class="mini-calc-keys">
+                <button class="key-clear" onclick="MiniCalc.clear()">C</button>
+                <button onclick="MiniCalc.append('/')">/</button>
+                <button onclick="MiniCalc.append('*')">*</button>
+                <button onclick="MiniCalc.backspace()">⌫</button>
+                <button onclick="MiniCalc.append('7')">7</button>
+                <button onclick="MiniCalc.append('8')">8</button>
+                <button onclick="MiniCalc.append('9')">9</button>
+                <button onclick="MiniCalc.append('-')">-</button>
+                <button onclick="MiniCalc.append('4')">4</button>
+                <button onclick="MiniCalc.append('5')">5</button>
+                <button onclick="MiniCalc.append('6')">6</button>
+                <button onclick="MiniCalc.append('+')">+</button>
+                <button onclick="MiniCalc.append('1')">1</button>
+                <button onclick="MiniCalc.append('2')">2</button>
+                <button onclick="MiniCalc.append('3')">3</button>
+                <button class="key-equal" onclick="MiniCalc.calculate()">=</button>
+                <button class="key-zero" onclick="MiniCalc.append('0')">0</button>
+                <button onclick="MiniCalc.append('.')">.</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MATERIAL MANAGER MODAL -->
+    <div class="modal-overlay" id="materialManagerOverlay">
+        <div class="modal-box">
+            <div class="mini-calc-header">
+                <h3>Správa materiálov</h3>
+                <button class="btn-close-calc" id="closeMaterialManager">×</button>
+            </div>
+            
+            <div class="mat-list" id="materialListContainer">
+                <!-- List will be here -->
+            </div>
+
+            <div style="margin-top: 15px; padding: 15px; background: rgba(99, 102, 241, 0.08); border: 2px solid var(--border); border-radius: 8px;">
+                <h4 style="margin: 0 0 15px 0; font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted);">Pridať nový materiál</h4>
+                
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label for="newMatName" style="font-size: 0.75rem;">Názov materiálu</label>
+                    <input type="text" id="newMatName" placeholder="Napr. Nylon Carbon">
+                </div>
+
+                <div class="row" style="margin-bottom: 15px;">
+                    <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                        <label for="newMatPrice" style="font-size: 0.75rem;">Cena (€/kg)</label>
+                        <div class="stepper-wrapper">
+                            <button type="button" class="stepper-btn reset-btn" data-action="reset" data-target="newMatPrice">0</button>
+                            <button type="button" class="stepper-btn" data-action="decrement" data-target="newMatPrice">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4" /></svg>
+                            </button>
+                            <input type="number" id="newMatPrice" placeholder="0.0" step="0.1">
+                            <button type="button" class="stepper-btn" data-action="increment" data-target="newMatPrice">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                        <label for="newMatType" style="font-size: 0.75rem;">Teplota</label>
+                        <select id="newMatType">
+                            <option value="low">Nízka</option>
+                            <option value="high">Vysoká</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button class="btn-primary" style="width: 100%; justify-content: center;" id="btnAddMaterial">Pridať do zoznamu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT MATERIAL MODAL -->
+    <div class="modal-overlay" id="editMaterialOverlay">
+        <div class="modal-box">
+            <div class="mini-calc-header">
+                <h3>Upraviť materiál</h3>
+                <button class="btn-close-calc" id="closeEditMaterial">×</button>
+            </div>
+            <input type="hidden" id="editMatId">
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label for="editMatName">Názov materiálu</label>
+                <input type="text" id="editMatName">
+            </div>
+            <div class="row" style="margin-bottom: 15px;">
+                <div class="form-group">
+                    <label for="editMatPrice">Cena (€/kg)</label>
+                    <div class="stepper-wrapper">
+                        <button type="button" class="stepper-btn reset-btn" data-action="reset" data-target="editMatPrice">0</button>
+                        <button type="button" class="stepper-btn" data-action="decrement" data-target="editMatPrice">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4" /></svg>
+                        </button>
+                        <input type="number" id="editMatPrice" step="0.1">
+                        <button type="button" class="stepper-btn" data-action="increment" data-target="editMatPrice">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="editMatType">Teplota</label>
+                    <select id="editMatType">
+                        <option value="low">Nízka</option>
+                        <option value="high">Vysoká</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn-primary" style="width: 100%; justify-content: center;" id="btnSaveMaterial">Uložiť zmeny</button>
         </div>
     </div>
 
@@ -507,8 +887,14 @@ const Calculator = {
         const taxAmount = priceNoTax * (taxPercent / 100);
         const priceWithTax = priceNoTax + taxAmount;
         
-        // Zaokrúhľovanie na 0.50 € nahor
-        const roundedPrice = Math.ceil(priceWithTax * 2) / 2;
+        // Zaokrúhľovanie podľa pravidla: do 20 centov nadol, od 20 centov nahor (v rámci 0.50 krokov)
+        const cents = Math.round(priceWithTax * 100);
+        const remainder50 = cents % 50; // Zvyšok po delení 50 centami
+        
+        let roundedCents = cents - remainder50; // Základ (podlaha na najbližších 50 centov)
+        if (remainder50 > 20) roundedCents += 50; // Ak je zvyšok viac ako 20, zaokrúhliť nahor
+        
+        const roundedPrice = roundedCents / 100;
         const roundingDiff = roundedPrice - priceWithTax;
         
         const totalProfit = laborCost + profitFromMargin + roundingDiff;
@@ -527,6 +913,291 @@ const Calculator = {
 };
 
 /**
+ * MINI KALKULAČKA
+ */
+const MiniCalc = {
+    display: null,
+    historyContainer: null,
+    history: [],
+    shouldReset: false, // Flag pre nový výpočet
+    
+    init() {
+        this.display = document.getElementById('miniCalcDisplay');
+        this.historyContainer = document.getElementById('miniCalcHistory');
+        document.addEventListener('keydown', (e) => this.handleKeyboard(e));
+        this.initDrag();
+    },
+
+    append(val) {
+        const isOperator = ['.', '/', '*', '-', '+'].includes(val);
+
+        // Ak máme začať nový príklad a užívateľ zadal číslo (nie operátor)
+        if (this.shouldReset) {
+            this.shouldReset = false;
+            if (!isOperator) this.display.value = '0';
+        }
+
+        if (this.display.value === '0' && !isOperator) {
+            this.display.value = val;
+        } else {
+            this.display.value += val;
+        }
+    },
+
+    clear() {
+        this.display.value = '0';
+    },
+
+    backspace() {
+        this.display.value = this.display.value.slice(0, -1) || '0';
+    },
+
+    calculate() {
+        try {
+            const expression = this.display.value;
+            // Bezpečné vyhodnotenie matematického výrazu
+            const result = eval(expression.replace(/[^-()\d/*+.]/g, ''));
+            this.display.value = result;
+            this.addToHistory(expression, result);
+            this.shouldReset = true; // Nastavíme flag, že ďalší vstup má resetovať displej
+        } catch (e) {
+            this.display.value = 'Error';
+            setTimeout(() => this.clear(), 1000);
+        }
+    },
+
+    addToHistory(expr, res) {
+        // Pridať na začiatok
+        this.history.unshift({ expr, res });
+        // Udržať len 5 posledných
+        if (this.history.length > 5) this.history.pop();
+        this.renderHistory();
+    },
+
+    renderHistory() {
+        this.historyContainer.innerHTML = this.history.map(item => `
+            <div class="history-item">
+                <span>${item.expr} =</span>
+                <strong>${item.res}</strong>
+            </div>
+        `).join('');
+    },
+
+    handleKeyboard(e) {
+        const overlay = document.getElementById('miniCalcOverlay');
+        if (!overlay.classList.contains('active')) return;
+
+        // Ignorovať ak užívateľ píše do formulára
+        const activeEl = document.activeElement;
+        const tag = activeEl.tagName;
+        if ((tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') && activeEl.id !== 'miniCalcDisplay') return;
+
+        const key = e.key;
+
+        if (/^[0-9.+\-*/]$/.test(key)) {
+            e.preventDefault();
+            this.append(key);
+        } else if (key === ',') {
+            e.preventDefault();
+            this.append('.');
+        } else if (key === 'Enter' || key === '=') {
+            e.preventDefault();
+            this.calculate();
+        } else if (key === 'Backspace') {
+            e.preventDefault();
+            this.backspace();
+        } else if (key === 'Escape' || key.toLowerCase() === 'c') {
+            e.preventDefault();
+            this.clear();
+        }
+    },
+
+    initDrag() {
+        const box = document.querySelector('.mini-calc-box');
+        const header = document.querySelector('.mini-calc-header');
+        
+        header.addEventListener('mousedown', (e) => {
+            // Ignorovať kliknutie na tlačidlo zavrieť
+            if (e.target.closest('.btn-close-calc')) return;
+
+            e.preventDefault();
+            
+            // Získať aktuálnu pozíciu a offset myši
+            const rect = box.getBoundingClientRect();
+            const shiftX = e.clientX - rect.left;
+            const shiftY = e.clientY - rect.top;
+
+            // Prepnutie na absolútne poziciovanie podľa okna
+            box.style.bottom = 'auto';
+            box.style.right = 'auto';
+            box.style.left = rect.left + 'px';
+            box.style.top = rect.top + 'px';
+            box.style.transition = 'none'; // Vypnúť animáciu počas ťahania
+
+            const onMouseMove = (ev) => {
+                box.style.left = (ev.clientX - shiftX) + 'px';
+                box.style.top = (ev.clientY - shiftY) + 'px';
+            };
+
+            const onMouseUp = () => {
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+                box.style.transition = ''; // Vrátiť animáciu
+            };
+
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+        });
+    }
+};
+
+/**
+ * MATERIAL MANAGER
+ */
+const MaterialManager = {
+    materials: [],
+    defaults: [
+        { id: 'def1', name: 'PLA Standard', price: 15, type: 'low', category: 'Standard' },
+        { id: 'def2', name: 'PETG Standard', price: 15, type: 'low', category: 'Standard' },
+        { id: 'def3', name: 'ASA Standard', price: 20, type: 'high', category: 'Standard' },
+        { id: 'def4', name: 'PC Standard', price: 30, type: 'high', category: 'Standard' },
+        { id: 'def5', name: 'TPU Standard', price: 25, type: 'low', category: 'Standard' },
+        { id: 'def6', name: 'PLA Profi', price: 20, type: 'low', category: 'Profi' },
+        { id: 'def7', name: 'PETG Profi', price: 20, type: 'low', category: 'Profi' },
+        { id: 'def8', name: 'ASA Profi', price: 25, type: 'high', category: 'Profi' },
+        { id: 'def9', name: 'PC Profi', price: 40, type: 'high', category: 'Profi' },
+        { id: 'def10', name: 'TPU Profi', price: 40, type: 'low', category: 'Profi' }
+    ],
+
+    init() {
+        this.load();
+        this.renderSelect();
+        this.bindEvents();
+    },
+
+    load() {
+        const saved = localStorage.getItem('all_materials');
+        if (saved) {
+            this.materials = JSON.parse(saved);
+        } else {
+            // Deep copy defaults to avoid reference issues (čistá kópia)
+            this.materials = JSON.parse(JSON.stringify(this.defaults));
+            this.save();
+        }
+    },
+
+    save() {
+        localStorage.setItem('all_materials', JSON.stringify(this.materials));
+        this.renderSelect();
+        this.renderList();
+    },
+
+    add(name, price, type) {
+        const newMat = {
+            id: 'custom_' + Date.now(),
+            name,
+            price: parseFloat(price),
+            type,
+            category: 'Vlastné'
+        };
+        this.materials.push(newMat);
+        this.save();
+    },
+
+    remove(id) {
+        this.materials = this.materials.filter(m => m.id !== id);
+        this.save();
+    },
+
+    updateMaterial(id, name, price, type) {
+        const index = this.materials.findIndex(m => m.id === id);
+        if (index !== -1) {
+            this.materials[index].name = name;
+            this.materials[index].price = parseFloat(price);
+            this.materials[index].type = type;
+            this.save();
+        }
+    },
+
+    edit(id) {
+        const mat = this.materials.find(m => m.id === id);
+        if (mat) {
+            // Otvoriť editovacie okno namiesto mazania
+            document.getElementById('editMatId').value = mat.id;
+            document.getElementById('editMatName').value = mat.name;
+            document.getElementById('editMatPrice').value = mat.price;
+            document.getElementById('editMatType').value = mat.type;
+            
+            // Zobraziť modal (rieši App trieda cez eventy, ale tu môžeme priamo volať overlay ak chceme, 
+            // alebo lepšie - vyvolať custom event. Pre jednoduchosť tu použijeme priamy prístup k DOM v App)
+            document.getElementById('editMaterialOverlay').classList.add('active');
+        }
+    },
+
+    renderSelect() {
+        const select = document.getElementById('materialSelect');
+        const currentVal = select.value;
+        select.innerHTML = '';
+
+        // Zoskupenie podľa kategórií
+        const categories = {};
+        this.materials.forEach(mat => {
+            const cat = mat.category || 'Ostatné';
+            if (!categories[cat]) categories[cat] = [];
+            categories[cat].push(mat);
+        });
+
+        for (const [catName, mats] of Object.entries(categories)) {
+            const group = document.createElement('optgroup');
+            group.label = catName;
+            mats.forEach(mat => {
+                const opt = document.createElement('option');
+                opt.value = mat.price;
+                opt.setAttribute('data-temp', mat.type);
+                opt.textContent = `${mat.name} (${mat.price}€)`;
+                group.appendChild(opt);
+            });
+            select.appendChild(group);
+        }
+        
+        if (currentVal) select.value = currentVal;
+    },
+
+    renderList() {
+        const container = document.getElementById('materialListContainer');
+        container.innerHTML = this.materials.map(mat => `
+                <div class="mat-item">
+                    <div class="mat-info">
+                        <span class="mat-name">${mat.name}</span>
+                        <div class="mat-meta" style="display: flex; gap: 8px; align-items: center; margin-top: 4px;">
+                            <span style="font-weight: bold; color: var(--text-main);">${parseFloat(mat.price).toFixed(2)} €/kg</span>
+                            <span style="font-size: 0.75rem; color: var(--text-muted); background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px;">${mat.type === 'high' ? '🔥 Vysoká' : '🌱 Nízka'}</span>
+                        </div>
+                    </div>
+                    <div style="display:flex;">
+                        <button class="btn-edit-mat" onclick="MaterialManager.edit('${mat.id}')" title="Upraviť">✎</button>
+                        <button class="btn-delete-mat" onclick="MaterialManager.remove('${mat.id}')" title="Vymazať">×</button>
+                    </div>
+                </div>
+        `).join('');
+    },
+
+    bindEvents() {
+        document.getElementById('btnAddMaterial').addEventListener('click', () => {
+            const name = document.getElementById('newMatName').value;
+            const price = document.getElementById('newMatPrice').value;
+            const type = document.getElementById('newMatType').value;
+
+            if (name && price) {
+                this.add(name, price, type);
+                document.getElementById('newMatName').value = '';
+                document.getElementById('newMatPrice').value = '';
+            }
+        });
+    }
+};
+
+/**
  * UI MANAŽMENT
  * Stará sa o DOM elementy a eventy.
  */
@@ -537,7 +1208,11 @@ const App = {
         this.cacheElements();
         this.bindEvents();
         this.loadTheme();
+        // Inicializovať materiály PRED prvým update, aby sa naplnil select
+        MaterialManager.init();
+        this.loadState(); // Načítať uložené hodnoty
         this.update(); // Prvý výpočet
+        MiniCalc.init();
     },
 
     cacheElements() {
@@ -572,6 +1247,22 @@ const App = {
         // Buttons
         this.elements.btnTheme = document.getElementById('btnTheme');
         this.elements.btnReset = document.getElementById('btnReset');
+        this.elements.btnFactoryReset = document.getElementById('btnFactoryReset');
+        
+        // Mini Calc
+        this.elements.btnMiniCalc = document.getElementById('btnMiniCalc');
+        this.elements.miniCalcOverlay = document.getElementById('miniCalcOverlay');
+        this.elements.closeMiniCalc = document.getElementById('closeMiniCalc');
+
+        // Material Manager
+        this.elements.btnManageMaterials = document.getElementById('btnManageMaterials');
+        this.elements.materialManagerOverlay = document.getElementById('materialManagerOverlay');
+        this.elements.closeMaterialManager = document.getElementById('closeMaterialManager');
+        
+        // Edit Material Modal
+        this.elements.editMaterialOverlay = document.getElementById('editMaterialOverlay');
+        this.elements.closeEditMaterial = document.getElementById('closeEditMaterial');
+        this.elements.btnSaveMaterial = document.getElementById('btnSaveMaterial');
     },
 
     bindEvents() {
@@ -593,6 +1284,72 @@ const App = {
         // Buttons
         this.elements.btnTheme.addEventListener('click', () => this.toggleTheme());
         this.elements.btnReset.addEventListener('click', () => this.reset());
+        this.elements.btnFactoryReset.addEventListener('click', () => this.factoryReset());
+        
+        // Mini Calc Toggles
+        this.elements.btnMiniCalc.addEventListener('click', () => {
+            this.elements.miniCalcOverlay.classList.add('active');
+        });
+        this.elements.closeMiniCalc.addEventListener('click', () => {
+            this.elements.miniCalcOverlay.classList.remove('active');
+        });
+
+        // Material Manager Toggles
+        this.elements.btnManageMaterials.addEventListener('click', () => {
+            this.elements.materialManagerOverlay.classList.add('active');
+            MaterialManager.renderList();
+        });
+        this.elements.closeMaterialManager.addEventListener('click', () => {
+            this.elements.materialManagerOverlay.classList.remove('active');
+        });
+
+        // Edit Material Logic
+        this.elements.closeEditMaterial.addEventListener('click', () => {
+            this.elements.editMaterialOverlay.classList.remove('active');
+        });
+        
+        this.elements.btnSaveMaterial.addEventListener('click', () => {
+            const id = document.getElementById('editMatId').value;
+            const name = document.getElementById('editMatName').value;
+            const price = document.getElementById('editMatPrice').value;
+            const type = document.getElementById('editMatType').value;
+            
+            MaterialManager.updateMaterial(id, name, price, type);
+            this.elements.editMaterialOverlay.classList.remove('active');
+        });
+
+        // Stepper Buttons Logic
+        document.querySelectorAll('.stepper-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const action = btn.dataset.action;
+                const targetId = btn.dataset.target;
+                const input = document.getElementById(targetId);
+                
+                let val = parseFloat(input.value) || 0;
+                const step = parseFloat(input.step) || 1;
+                const min = parseFloat(input.min);
+
+                if (action === 'increment') val += step;
+                else if (action === 'decrement') val -= step;
+                else if (action === 'reset') val = (!isNaN(min) ? min : 0);
+
+                // Ošetrenie minima a zaokrúhlenie (pre desatinné čísla)
+                if (!isNaN(min) && val < min) val = min;
+                val = Math.round(val * 100) / 100;
+
+                input.value = val;
+                input.dispatchEvent(new Event('input')); // Spustí prepočet
+            });
+        });
+
+        // Zatváranie okien pri kliknutí mimo (na pozadie)
+        document.querySelectorAll('.modal-overlay, .mini-calc-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.classList.remove('active');
+                }
+            });
+        });
     },
 
     getInputs() {
@@ -627,12 +1384,19 @@ const App = {
 
         // 4. Vykresli
         this.render(unitCost, results, inputs.multiplier);
+        this.saveState(); // Uložiť aktuálny stav
     },
 
     updateMachineTag(tempType, rate) {
         const tag = this.elements.machineRateTag;
         const isHigh = tempType === 'high';
-        tag.textContent = isHigh ? `ASA/PC (${rate.toFixed(2)}€/h)` : `PLA/PETG (${rate.toFixed(2)}€/h)`;
+        
+        // Použitie ikon namiesto textu PLA/ASA
+        const icon = isHigh ? '🔥' : '🌱';
+        const label = isHigh ? 'Vysoká teplota' : 'Nízka teplota';
+        
+        tag.innerHTML = `${icon} ${rate.toFixed(2)}€/h`;
+        tag.title = label; // Tooltip po nabehnutí myšou
         tag.className = `tag ${isHigh ? 'high' : 'low'}`;
     },
 
@@ -646,7 +1410,7 @@ const App = {
 
         this.elements.breakdownDisplay.innerHTML = `
             <div class="breakdown-item">
-                <span>Výrobné náklady (${count} ks)</span>
+                <span>Výrobné náklady (${count} podložiek)</span>
                 <span>${results.totalProductionCost.toFixed(2)} €</span>
             </div>
             <div class="breakdown-item">
@@ -714,12 +1478,68 @@ const App = {
         this.elements.margin.value = 20;
         this.elements.tax.value = 0;
         this.update();
+    },
+
+    factoryReset() {
+        if (confirm('Naozaj chcete obnoviť výrobné nastavenia? Vymažú sa všetky vlastné materiály a zmeny.')) {
+            localStorage.removeItem('all_materials');
+            MaterialManager.load(); // Načíta defaultné hodnoty
+            MaterialManager.renderSelect();
+            MaterialManager.renderList();
+            this.reset();
+        }
+    },
+
+    saveState() {
+        const state = {
+            jobName: this.elements.jobName.value,
+            materialSelectIndex: this.elements.materialSelect.selectedIndex,
+            materialPrice: this.elements.materialPrice.value,
+            weight: this.elements.weight.value,
+            printTime: this.elements.printTime.value,
+            adminFee: this.elements.adminFee.value,
+            useAMS: this.elements.useAMS.checked,
+            multiplier: this.elements.multiplier.value,
+            workTime: this.elements.workTime.value,
+            margin: this.elements.margin.value,
+            tax: this.elements.tax.value
+        };
+        localStorage.setItem('calc_state', JSON.stringify(state));
+    },
+
+    loadState() {
+        const saved = localStorage.getItem('calc_state');
+        if (!saved) return;
+        
+        try {
+            const state = JSON.parse(saved);
+            
+            if (state.jobName !== undefined) this.elements.jobName.value = state.jobName;
+            if (state.materialSelectIndex !== undefined && state.materialSelectIndex < this.elements.materialSelect.options.length) {
+                this.elements.materialSelect.selectedIndex = state.materialSelectIndex;
+            }
+            if (state.materialPrice !== undefined) this.elements.materialPrice.value = state.materialPrice;
+            if (state.weight !== undefined) this.elements.weight.value = state.weight;
+            if (state.printTime !== undefined) this.elements.printTime.value = state.printTime;
+            if (state.adminFee !== undefined) this.elements.adminFee.value = state.adminFee;
+            if (state.useAMS !== undefined) this.elements.useAMS.checked = state.useAMS;
+            if (state.multiplier !== undefined) this.elements.multiplier.value = state.multiplier;
+            if (state.workTime !== undefined) this.elements.workTime.value = state.workTime;
+            if (state.margin !== undefined) this.elements.margin.value = state.margin;
+            if (state.tax !== undefined) this.elements.tax.value = state.tax;
+        } catch (e) {
+            console.error("Chyba pri načítaní stavu:", e);
+        }
     }
 };
 
+// Exportovanie objektov do globálneho rozsahu pre HTML event handlery (oprava MiniCalc)
+window.MiniCalc = MiniCalc;
+window.MaterialManager = MaterialManager;
+window.App = App;
+
 // Spustenie aplikácie
 document.addEventListener('DOMContentLoaded', () => App.init());
-
 </script>
 
 </body>
